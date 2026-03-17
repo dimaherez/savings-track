@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.auth.domain
+package com.dmytroherez.savingstrack.domain
 
 data class UserModel(
     val email: String,

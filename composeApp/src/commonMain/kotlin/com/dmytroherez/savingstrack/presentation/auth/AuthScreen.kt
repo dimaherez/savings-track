@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.auth.presentation.auth
+package com.dmytroherez.savingstrack.presentation.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,9 +30,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dmytroherez.savingstrack.MainScreen
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.presentation.components.inputs.TextInput
-import com.dmytroherez.savingstrack.auth.presentation.home.HomeScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -49,7 +49,7 @@ data object AuthScreen : Screen {
                 viewModel.event.collect { event ->
                     when (event) {
                         AuthEvent.LoginSuccess -> {
-                            navigator.replaceAll(HomeScreen) // to clear backstack
+                            navigator.replaceAll(MainScreen) // to clear backstack
                         }
                     }
                 }

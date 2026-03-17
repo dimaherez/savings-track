@@ -1,6 +1,6 @@
-package com.dmytroherez.savingstrack.auth.presentation.auth
+package com.dmytroherez.savingstrack.presentation.auth
 
-import com.dmytroherez.savingstrack.auth.domain.UserModel
+import com.dmytroherez.savingstrack.domain.UserModel
 
 sealed interface AuthAction {
     data class OnEmailInputChanged(val emailText: String): AuthAction

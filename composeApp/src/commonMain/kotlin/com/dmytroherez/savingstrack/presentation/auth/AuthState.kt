@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.auth.presentation.auth
+package com.dmytroherez.savingstrack.presentation.auth
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiState
 

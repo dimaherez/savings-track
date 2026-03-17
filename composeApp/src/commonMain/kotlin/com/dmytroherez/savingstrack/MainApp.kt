@@ -1,13 +1,95 @@
 package com.dmytroherez.savingstrack
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import com.dmytroherez.savingstrack.auth.presentation.auth.AuthScreen
+import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.CurrentTab
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import cafe.adriel.voyager.navigator.tab.Tab
+import cafe.adriel.voyager.navigator.tab.TabNavigator
+import com.dmytroherez.savingstrack.presentation.auth.AuthScreen
+import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
+import com.dmytroherez.savingstrack.presentation.crypto.CryptoTab
+import com.dmytroherez.savingstrack.presentation.fiat.FiatTab
+import com.dmytroherez.savingstrack.presentation.home.HomeTab
+import com.dmytroherez.savingstrack.presentation.income.IncomeTab
+import org.koin.compose.koinInject
 
 @Composable
 fun MainApp() {
     MaterialTheme {
-        Navigator(AuthScreen)
+        Navigator(SplashScreen())
     }
+}
+
+class SplashScreen : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+
+        val dataStore = koinInject<DataStoreRepo>()
+        val isLoggedIn by dataStore.isLoggedIn.collectAsState(initial = null)
+
+        LaunchedEffect(isLoggedIn) {
+            when (isLoggedIn) {
+                true -> navigator.replaceAll(MainScreen)
+                false -> navigator.replaceAll(AuthScreen)
+                null -> { /* Still checking... do nothing and let the UI load */ }
+            }
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    }
+}
+
+data object MainScreen : Screen {
+    @Composable
+    override fun Content() {
+        TabNavigator(HomeTab) {
+            Scaffold(
+                bottomBar = {
+                    NavigationBar {
+                        TabNavigationItem(HomeTab)
+                        TabNavigationItem(FiatTab)
+                        TabNavigationItem(CryptoTab)
+                        TabNavigationItem(IncomeTab)
+                    }
+                }
+            ) {
+                CurrentTab()
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowScope.TabNavigationItem(tab: Tab) {
+    val tabNavigator = LocalTabNavigator.current
+    NavigationBarItem(
+        selected = tabNavigator.current == tab,
+        onClick = { tabNavigator.current = tab },
+        label = { Text(tab.options.title) },
+        icon = {}
+    )
 }

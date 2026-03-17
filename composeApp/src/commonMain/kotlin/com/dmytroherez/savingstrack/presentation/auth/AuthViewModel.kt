@@ -1,8 +1,13 @@
-package com.dmytroherez.savingstrack.auth.presentation.auth
+package com.dmytroherez.savingstrack.presentation.auth
 
+import androidx.lifecycle.viewModelScope
+import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
 import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
+import kotlinx.coroutines.launch
 
-class AuthViewModel : BaseViewModel<AuthState, AuthEvent>(
+class AuthViewModel(
+    private val dataStoreRepo: DataStoreRepo
+) : BaseViewModel<AuthState, AuthEvent>(
     AuthState()
 ) {
     fun onAction(action: AuthAction) {
@@ -20,9 +25,12 @@ class AuthViewModel : BaseViewModel<AuthState, AuthEvent>(
             }
 
             is AuthAction.SubmitLogin -> {
-                sendEvent(
-                    AuthEvent.LoginSuccess
-                )
+                viewModelScope.launch {
+                    dataStoreRepo.setIsLoggedIn()
+                    sendEvent(
+                        AuthEvent.LoginSuccess
+                    )
+                }
             }
 
             is AuthAction.Register -> Unit

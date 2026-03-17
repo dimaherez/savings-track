@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.auth.presentation.home
+package com.dmytroherez.savingstrack.presentation.home
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiEvent
 
