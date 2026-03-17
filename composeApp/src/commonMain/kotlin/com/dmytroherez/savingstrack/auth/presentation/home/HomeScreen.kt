@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.home
+package com.dmytroherez.savingstrack.auth.presentation.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

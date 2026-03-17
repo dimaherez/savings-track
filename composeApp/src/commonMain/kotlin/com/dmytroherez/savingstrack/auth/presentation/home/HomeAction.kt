@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.home
+package com.dmytroherez.savingstrack.auth.presentation.home
 
 sealed interface HomeAction {
     data object SomeAction : HomeAction

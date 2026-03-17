@@ -32,7 +32,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.presentation.components.inputs.TextInput
-import com.dmytroherez.savingstrack.home.HomeScreen
+import com.dmytroherez.savingstrack.auth.presentation.home.HomeScreen
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
