@@ -1,0 +1,11 @@
+ktor:
+    application:
+        modules:
+            - com.savingstrack.ApplicationKt.module
+    deployment:
+        port: 8080
+
+storage:
+    jdbcURL: ${DB_URL}
+    user: ${DB_USER}
+    password: ${DB_PASSWORD}
