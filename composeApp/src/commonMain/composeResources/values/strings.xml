@@ -4,4 +4,7 @@
     <string name="email_placeholder">email@example.com</string>
     <string name="password">Password</string>
     <string name="password_placeholder">********</string>
+
+    <string name="fiat">Fiat</string>
+    <string name="crypto">Crypto</string>
 </resources>

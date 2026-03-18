@@ -14,14 +14,20 @@ kotlin {
     jvmToolchain(21)
 }
 
+sourceSets {
+    main {
+        kotlin.srcDirs("main/kotlin")
+        resources.srcDirs("main/resources")
+    }
+}
+
 dependencies {
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
-    implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.config.yaml)
     testImplementation(libs.ktor.server.test.host)
-    testImplementation(libs.kotlin.test.junit)
+    testImplementation(libs.kotlin.testJunit)
 
     // Database
     implementation(libs.postgresql)

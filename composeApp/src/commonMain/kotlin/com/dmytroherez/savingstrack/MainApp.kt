@@ -3,12 +3,16 @@ package com.dmytroherez.savingstrack
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,7 +38,14 @@ import org.koin.compose.koinInject
 @Composable
 fun MainApp() {
     MaterialTheme {
-        Navigator(SplashScreen())
+        Scaffold { innerPadding ->
+            Surface(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                Navigator(SplashScreen())
+            }
+        }
     }
 }
 
@@ -64,9 +75,12 @@ class SplashScreen : Screen {
 }
 
 data object MainScreen : Screen {
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         TabNavigator(HomeTab) {
+            val tabNavigator = LocalTabNavigator.current
+
             Scaffold(
                 bottomBar = {
                     NavigationBar {
@@ -75,9 +89,23 @@ data object MainScreen : Screen {
                         TabNavigationItem(CryptoTab)
                         TabNavigationItem(IncomeTab)
                     }
+                },
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = tabNavigator.current.options.title,
+                                style = MaterialTheme.typography.headlineMedium
+                            )
+                        }
+                    )
                 }
-            ) {
-                CurrentTab()
+            ) { innerPadding ->
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(innerPadding)
+                ) {
+                    CurrentTab()
+                }
             }
         }
     }

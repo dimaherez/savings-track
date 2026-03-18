@@ -4,27 +4,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +33,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
+import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -51,13 +52,47 @@ object FiatTab: Tab {
 
     @Composable
     override fun Content() {
+        val coroutineScope = rememberCoroutineScope()
+
         val viewModel = koinViewModel<FiatViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
 
-        FiatScreenContent(
-            state = state,
-            onAction = viewModel::onAction
-        )
+        val pagerState = rememberPagerState { SavingsPagerTab.entries.size }
+
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            TabRow(
+                selectedTabIndex = pagerState.currentPage
+            ) {
+                SavingsPagerTab.entries.forEach { tabEntry ->
+                    Tab(
+                        selected = pagerState.currentPage == tabEntry.ordinal,
+                        onClick = {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(tabEntry.ordinal)
+                            }
+                        },
+                        text = { Text(text = tabEntry.title.asString()) }
+                    )
+                }
+            }
+
+            val data = when(SavingsPagerTab.entries[pagerState.currentPage]) {
+                SavingsPagerTab.FIAT -> state.fiatSavings
+                SavingsPagerTab.CRYPTO -> state.cryptoSavings
+            }
+
+            HorizontalPager(
+                state = pagerState
+            ) {
+                FiatScreenContent(
+                    state = state,
+                    onAction = viewModel::onAction
+                )
+            }
+        }
+
     }
 }
 
@@ -70,7 +105,7 @@ private fun FiatScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Card(
