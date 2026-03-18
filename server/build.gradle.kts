@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 group = "com.savingstrack"
@@ -29,6 +30,8 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.testJunit)
 
+    implementation(libs.ktor.serialization.kotlinx.json)
+
     // Database
     implementation(libs.postgresql)
     implementation(libs.hikaricp)
@@ -36,4 +39,7 @@ dependencies {
     implementation(libs.exposed.json)
     implementation(libs.exposed.kotlin.datetime)
     implementation(libs.exposed.jdbc)
+    implementation(libs.ktor.server.content.negotiation)
+
+    implementation(project(":shared"))
 }
