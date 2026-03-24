@@ -5,7 +5,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 
 sealed interface UiText {
-    data class DynamicString(val value: String) : UiText
+    data class DynamicString(val value: String?) : UiText
     data class StringResourceId(val resId: StringResource, val args: Array<Any> = arrayOf()) : UiText {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -29,7 +29,7 @@ sealed interface UiText {
     @Composable
     fun asString(): String {
         return when(this) {
-            is DynamicString -> value
+            is DynamicString -> value ?: "Something went wrong"
             is StringResourceId -> stringResource(resId, *args)
         }
     }

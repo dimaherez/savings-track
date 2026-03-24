@@ -51,6 +51,10 @@ data object AuthScreen : Screen {
                         AuthEvent.LoginSuccess -> {
                             navigator.replaceAll(MainScreen) // to clear backstack
                         }
+
+                        is AuthEvent.ShowErrorToast -> {
+
+                        }
                     }
                 }
             }

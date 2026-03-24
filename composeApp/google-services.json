@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1071067765660",
+    "project_id": "savingstrack-669e8",
+    "storage_bucket": "savingstrack-669e8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1071067765660:android:327b17bdd0e36b9ac80659",
+        "android_client_info": {
+          "package_name": "com.dmytroherez.savingstrack"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1071067765660-v5j0d2mcbg7q13oah1441js7gu95hlla.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJ5ZO-C6ref-yy9a1gRL_x1qyIyr0to2Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1071067765660-v5j0d2mcbg7q13oah1441js7gu95hlla.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1071067765660-2hnmnse5oag9l92elksoj02vleatq3se.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.dmytroherez.savingstrack"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,7 @@
 package com.savingstrack
 
 import com.savingstrack.repo.SavingsRepository
-import com.savingstrack.routing.savingsRoutes
+import com.savingstrack.routing.postSaving
 import com.savingstrack.tables.SavingsTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -25,9 +25,6 @@ fun Application.module() {
     }
 
     initDatabase()
-
-    val repository = SavingsRepository()
-    savingsRoutes(repository)
 
     configureRouting()
 }

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    id("com.google.gms.google-services")
 }
 
 kotlin {
@@ -53,6 +54,9 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.tab.navigator)
             implementation(libs.voyager.screenmodel)
+
+            // firebase
+            implementation(libs.firebase.auth)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -6,6 +6,10 @@ import com.dmytroherez.savingstrack.presentation.fiat.FiatViewModel
 import com.dmytroherez.savingstrack.presentation.home.HomeViewModel
 import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
+import com.dmytroherez.savingstrack.data.repoimpl.AuthRepoImpl
+import com.dmytroherez.savingstrack.domain.repo.AuthRepo
+import com.dmytroherez.savingstrack.domain.usecase.LoginUC
+import com.dmytroherez.savingstrack.domain.usecase.RegisterUC
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
@@ -15,14 +19,21 @@ expect val platformDataStoreModule: Module
 
 val dataModule = module {
     single { DataStoreRepo(dataStore = get()) }
+
+    single<AuthRepo> { AuthRepoImpl() }
 }
 
 val domainModule = module {
-
+    single<RegisterUC> { RegisterUC(authRepo = get()) }
+    single<LoginUC> { LoginUC(authRepo = get()) }
 }
 
 val presentationModule = module {
-    viewModel { AuthViewModel(dataStoreRepo = get()) }
+    viewModel { AuthViewModel(
+        dataStoreRepo = get(),
+        registerUC = get(),
+        loginUC = get()
+    ) }
     factoryOf(::HomeViewModel)
     factoryOf(::FiatViewModel)
     factoryOf(::CryptoViewModel)
