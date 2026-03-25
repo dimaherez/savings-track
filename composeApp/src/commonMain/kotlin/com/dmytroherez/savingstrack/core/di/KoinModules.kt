@@ -7,10 +7,13 @@ import com.dmytroherez.savingstrack.presentation.home.HomeViewModel
 import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
 import com.dmytroherez.savingstrack.data.repoimpl.AuthRepoImpl
+import com.dmytroherez.savingstrack.data.repoimpl.SavingsRepoImpl
 import com.dmytroherez.savingstrack.domain.repo.AuthRepo
-import com.dmytroherez.savingstrack.domain.usecase.GetCurrentUserUC
-import com.dmytroherez.savingstrack.domain.usecase.LoginUC
-import com.dmytroherez.savingstrack.domain.usecase.RegisterUC
+import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
+import com.dmytroherez.savingstrack.domain.usecase.auth.GetCurrentUserUC
+import com.dmytroherez.savingstrack.domain.usecase.auth.LoginUC
+import com.dmytroherez.savingstrack.domain.usecase.auth.RegisterUC
+import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsUC
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
@@ -22,12 +25,14 @@ val dataModule = module {
     single { DataStoreRepo(dataStore = get()) }
 
     single<AuthRepo> { AuthRepoImpl() }
+    single<SavingsRepo> { SavingsRepoImpl() }
 }
 
 val domainModule = module {
     single<RegisterUC> { RegisterUC(authRepo = get()) }
     single<LoginUC> { LoginUC(authRepo = get()) }
     single<GetCurrentUserUC> { GetCurrentUserUC(authRepo = get()) }
+    single<GetSavingsUC> { GetSavingsUC(savingsRepo = get()) }
 }
 
 val presentationModule = module {
@@ -41,8 +46,11 @@ val presentationModule = module {
         getCurrentUserUC = get()
     ) }
 
+    viewModel { SavingsViewModel(
+        getSavingsUC = get()
+    ) }
+
     factoryOf(::HomeViewModel)
-    factoryOf(::SavingsViewModel)
     factoryOf(::IncomeViewModel)
 }
 

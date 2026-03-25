@@ -1,23 +1,30 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
-group = "org.example"
+group = "com.dmytroherez.savingstrack"
 version = "unspecified"
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    implementation(libs.ktor.serialization.kotlinx.json)
-}
-
 kotlin {
-    jvmToolchain(21)
+    jvm()
+    androidTarget()
+
+    iosArm64()
+    iosSimulatorArm64()
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.ktor.serialization.kotlinx.json)
+        }
+    }
 }
 
-tasks.test {
-    useJUnitPlatform()
+android {
+    namespace = "com.dmytroherez.savingstrack.shared"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
 }

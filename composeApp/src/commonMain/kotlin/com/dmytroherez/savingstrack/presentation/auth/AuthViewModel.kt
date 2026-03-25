@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
 import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.UiText.*
-import com.dmytroherez.savingstrack.domain.usecase.LoginUC
-import com.dmytroherez.savingstrack.domain.usecase.RegisterUC
+import com.dmytroherez.savingstrack.domain.usecase.auth.LoginUC
+import com.dmytroherez.savingstrack.domain.usecase.auth.RegisterUC
 import com.dmytroherez.savingstrack.presentation.auth.AuthEvent.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO

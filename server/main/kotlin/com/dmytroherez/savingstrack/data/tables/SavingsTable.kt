@@ -1,10 +1,9 @@
-package com.savingstrack.tables
+package com.dmytroherez.savingstrack.data.tables
 
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.datetime.CurrentTimestamp
 import org.jetbrains.exposed.v1.datetime.timestamp
 import kotlin.time.ExperimentalTime
-
 
 object SavingsTable : Table("savings") {
     val id = integer("id").autoIncrement()

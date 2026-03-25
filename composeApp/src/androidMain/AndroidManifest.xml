@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:name=".App"
         tools:replace="android:name"
+        android:usesCleartextTraffic="true"
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
         <activity
             android:exported="true"

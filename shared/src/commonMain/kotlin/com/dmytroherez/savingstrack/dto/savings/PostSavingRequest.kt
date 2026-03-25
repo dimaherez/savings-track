@@ -1,4 +1,4 @@
-package org.example.dto.savings
+package com.dmytroherez.savingstrack.dto.savings
 
 import kotlinx.serialization.Serializable
 

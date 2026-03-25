@@ -3,7 +3,7 @@ package com.dmytroherez.savingstrack
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cafe.adriel.voyager.core.screen.Screen
-import com.dmytroherez.savingstrack.domain.usecase.GetCurrentUserUC
+import com.dmytroherez.savingstrack.domain.usecase.auth.GetCurrentUserUC
 import com.dmytroherez.savingstrack.presentation.auth.AuthScreen
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow

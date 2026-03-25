@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
-group = "com.savingstrack"
+group = "com.dmytroherez.savingstrack"
 version = "0.0.1"
 
 application {

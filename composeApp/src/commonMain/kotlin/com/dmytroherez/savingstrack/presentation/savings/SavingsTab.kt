@@ -20,6 +20,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,12 +30,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.dmytroherez.savingstrack.MainScreen
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
 import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
+import com.dmytroherez.savingstrack.presentation.auth.AuthEvent
 import kotlinx.coroutines.launch
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -52,11 +59,24 @@ object SavingsTab: Tab {
     @Composable
     override fun Content() {
         val coroutineScope = rememberCoroutineScope()
+        val lifecycleOwner = LocalLifecycleOwner.current
 
         val viewModel = koinViewModel<SavingsViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
 
         val pagerState = rememberPagerState { SavingsPagerTab.entries.size }
+
+        LaunchedEffect(lifecycleOwner.lifecycle) {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.event.collect { event ->
+                    when (event) {
+                        is SavingsEvent.ShowErrorToast -> {
+                            showToast(event.message.asStringSuspend())
+                        }
+                    }
+                }
+            }
+        }
 
         Column(
             modifier = Modifier.fillMaxSize()
@@ -138,21 +158,34 @@ private fun FiatScreenContent(
 
             LazyColumn(
                 modifier = Modifier
-                    .weight(1.5f)
+                    .weight(1f)
                     .clip(RoundedCornerShape(24.dp))
                     .weight(1f)
             ) {
-                items(4) {
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Currency$it")
-                        Text("Value$it")
+                state.savings.forEach { savingItem ->
+                    item {
+                        Row (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Currency${savingItem.currency}")
+                            Text("Value${savingItem.amount}")
+                        }
                     }
                 }
+//                items(4) {
+//                    Row (
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(vertical = 8.dp),
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        Text("Currency$it")
+//                        Text("Value$it")
+//                    }
+//                }
             }
         }
 

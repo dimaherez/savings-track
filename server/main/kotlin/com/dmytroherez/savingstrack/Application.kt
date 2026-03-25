@@ -1,6 +1,6 @@
-package com.savingstrack
+package com.dmytroherez.savingstrack
 
-import com.savingstrack.tables.SavingsTable
+import com.dmytroherez.savingstrack.data.tables.SavingsTable
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.serialization.kotlinx.json.json

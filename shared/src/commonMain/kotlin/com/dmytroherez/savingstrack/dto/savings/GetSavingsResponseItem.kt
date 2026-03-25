@@ -1,9 +1,12 @@
-package org.example.dto.savings
+package com.dmytroherez.savingstrack.dto.savings
 
+import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-data class GetSavingsResponseItem @OptIn(ExperimentalTime::class) constructor(
+@OptIn(ExperimentalTime::class)
+@Serializable
+data class GetSavingsResponseItem(
     val id: Int,
     val userId: String,
     val currency: String,

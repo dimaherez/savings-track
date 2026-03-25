@@ -1,14 +1,14 @@
-package com.savingstrack.repo
+package com.dmytroherez.savingstrack.data.repo
 
-import com.savingstrack.tables.SavingsTable
-import com.savingstrack.tables.SavingsTable.amount
-import com.savingstrack.tables.SavingsTable.createdAt
-import com.savingstrack.tables.SavingsTable.currency
-import com.savingstrack.tables.SavingsTable.description
+import com.dmytroherez.savingstrack.data.tables.SavingsTable
+import com.dmytroherez.savingstrack.data.tables.SavingsTable.amount
+import com.dmytroherez.savingstrack.data.tables.SavingsTable.createdAt
+import com.dmytroherez.savingstrack.data.tables.SavingsTable.currency
+import com.dmytroherez.savingstrack.data.tables.SavingsTable.description
+import com.dmytroherez.savingstrack.dto.savings.GetSavingsResponseItem
+import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.example.dto.savings.GetSavingsResponseItem
-import org.example.dto.savings.PostSavingRequest
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.selectAll
@@ -19,7 +19,6 @@ class SavingsRepository {
     private suspend fun <T> dbQuery(block: suspend () -> T): T = withContext(Dispatchers.IO) {
         suspendTransaction { block() }
     }
-
 
     suspend fun addSaving(saving: PostSavingRequest): Int {
         return dbQuery {
