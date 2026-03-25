@@ -57,6 +57,9 @@ kotlin {
 
             // firebase
             implementation(libs.firebase.auth)
+
+            // toast
+            implementation(libs.cmptoast)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

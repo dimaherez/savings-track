@@ -19,6 +19,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
@@ -34,6 +38,7 @@ import com.dmytroherez.savingstrack.presentation.fiat.FiatTab
 import com.dmytroherez.savingstrack.presentation.home.HomeTab
 import com.dmytroherez.savingstrack.presentation.income.IncomeTab
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainApp() {
@@ -52,16 +57,17 @@ fun MainApp() {
 class SplashScreen : Screen {
     @Composable
     override fun Content() {
+        val lifecycleOwner = LocalLifecycleOwner.current
         val navigator = LocalNavigator.currentOrThrow
+        val viewModel = koinViewModel<MainViewModel>()
 
-        val dataStore = koinInject<DataStoreRepo>()
-        val isLoggedIn by dataStore.isLoggedIn.collectAsState(initial = null)
+//        val dataStore = koinInject<DataStoreRepo>()
 
-        LaunchedEffect(isLoggedIn) {
-            when (isLoggedIn) {
-                true -> navigator.replaceAll(MainScreen)
-                false -> navigator.replaceAll(AuthScreen)
-                null -> { /* Still checking... do nothing and let the UI load */ }
+        LaunchedEffect(lifecycleOwner) {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.initScreen.collect { initScreen ->
+                    navigator.replaceAll(initScreen)
+                }
             }
         }
 

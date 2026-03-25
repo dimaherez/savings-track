@@ -52,9 +52,7 @@ fun ButtonPrimary(
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(32.dp),
-                color = Color.White,
-                trackColor = Color.Transparent,
+                color = MaterialTheme.colorScheme.onPrimary
             )
         } else {
             Row(

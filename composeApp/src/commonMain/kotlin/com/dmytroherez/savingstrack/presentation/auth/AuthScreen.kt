@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.dmytroherez.savingstrack.MainScreen
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.presentation.components.inputs.TextInput
+import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -49,11 +51,15 @@ data object AuthScreen : Screen {
                 viewModel.event.collect { event ->
                     when (event) {
                         AuthEvent.LoginSuccess -> {
-                            navigator.replaceAll(MainScreen) // to clear backstack
+                            navigator.replaceAll(MainScreen)
                         }
 
                         is AuthEvent.ShowErrorToast -> {
+                            showToast(message = event.message.asStringSuspend())
+                        }
 
+                        AuthEvent.RegisterSuccess -> {
+                            navigator.replaceAll(MainScreen)
                         }
                     }
                 }
@@ -100,9 +106,26 @@ fun AuthScreenContent(
 
         ButtonPrimary(
             modifier = Modifier.fillMaxWidth(),
-            text = "Login",
-            onClick = { onAction(AuthAction.SubmitLogin) }
+            text = when(state.mode) {
+                AuthMode.LOGIN -> "Login"
+                AuthMode.REGISTER -> "Register"
+            },
+            isLoading = state.isLoading,
+            onClick = { onAction(AuthAction.SubmitAuthAction) }
         )
+
+        TextButton(
+            onClick = {
+                onAction(AuthAction.ToggleMode)
+            }
+        ) {
+            Text(
+                text = when(state.mode) {
+                    AuthMode.LOGIN -> "Register"
+                    AuthMode.REGISTER -> "Login"
+                }
+            )
+        }
     }
 }
 
@@ -140,7 +163,7 @@ private fun CredentialInputs(
         keyboardActions = KeyboardActions(
             onDone = {
                 focusManager.clearFocus()
-                onAction(AuthAction.SubmitLogin)
+                onAction(AuthAction.SubmitAuthAction)
             }
         )
     )

@@ -4,5 +4,5 @@ interface AuthRepo {
     suspend fun register(email: String, pass: String): Result<String>
     suspend fun login(email: String, pass: String): Result<String>
     suspend fun logout()
-    fun isUserLoggedIn(): Result<Unit>
+    fun getCurrentUser(): Result<Unit>
 }

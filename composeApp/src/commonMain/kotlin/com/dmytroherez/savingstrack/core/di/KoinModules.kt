@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack.core.di
 
+import com.dmytroherez.savingstrack.MainViewModel
 import com.dmytroherez.savingstrack.presentation.auth.AuthViewModel
 import com.dmytroherez.savingstrack.presentation.crypto.CryptoViewModel
 import com.dmytroherez.savingstrack.presentation.fiat.FiatViewModel
@@ -8,6 +9,7 @@ import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
 import com.dmytroherez.savingstrack.data.repoimpl.AuthRepoImpl
 import com.dmytroherez.savingstrack.domain.repo.AuthRepo
+import com.dmytroherez.savingstrack.domain.usecase.GetCurrentUserUC
 import com.dmytroherez.savingstrack.domain.usecase.LoginUC
 import com.dmytroherez.savingstrack.domain.usecase.RegisterUC
 import org.koin.core.module.Module
@@ -26,6 +28,7 @@ val dataModule = module {
 val domainModule = module {
     single<RegisterUC> { RegisterUC(authRepo = get()) }
     single<LoginUC> { LoginUC(authRepo = get()) }
+    single<GetCurrentUserUC> { GetCurrentUserUC(authRepo = get()) }
 }
 
 val presentationModule = module {
@@ -34,6 +37,11 @@ val presentationModule = module {
         registerUC = get(),
         loginUC = get()
     ) }
+
+    viewModel { MainViewModel(
+        getCurrentUserUC = get()
+    ) }
+
     factoryOf(::HomeViewModel)
     factoryOf(::FiatViewModel)
     factoryOf(::CryptoViewModel)
