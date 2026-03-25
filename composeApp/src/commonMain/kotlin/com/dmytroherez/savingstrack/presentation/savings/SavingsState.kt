@@ -1,7 +1,6 @@
-package com.dmytroherez.savingstrack.presentation.fiat
+package com.dmytroherez.savingstrack.presentation.savings
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiState
-import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
 
 data class FiatState(
     val something: String = "",

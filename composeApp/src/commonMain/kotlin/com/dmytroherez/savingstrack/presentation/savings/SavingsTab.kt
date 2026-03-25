@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.presentation.fiat
+package com.dmytroherez.savingstrack.presentation.savings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,18 +34,17 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
 import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
-object FiatTab: Tab {
+object SavingsTab: Tab {
     override val options: TabOptions
         @Composable
         get() = remember {
             TabOptions(
                 index = 0u,
-                title = "Fiat",
+                title = "Savings",
                 icon = null
             )
         }
@@ -54,7 +53,7 @@ object FiatTab: Tab {
     override fun Content() {
         val coroutineScope = rememberCoroutineScope()
 
-        val viewModel = koinViewModel<FiatViewModel>()
+        val viewModel = koinViewModel<SavingsViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
 
         val pagerState = rememberPagerState { SavingsPagerTab.entries.size }
@@ -99,13 +98,13 @@ object FiatTab: Tab {
 @Composable
 private fun FiatScreenContent(
     state: FiatState,
-    onAction: (FiatAction) -> Unit = {}
+    onAction: (SavingsAction) -> Unit = {}
 ) {
     Box {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Card(
@@ -116,7 +115,7 @@ private fun FiatScreenContent(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = "Total saved",
+                        text = "Total holding",
                         style = MaterialTheme.typography.labelLarge
                     )
                     Text(
@@ -126,16 +125,16 @@ private fun FiatScreenContent(
                 }
             }
 
-            Text(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.secondaryContainer),
-                textAlign = TextAlign.Center,
-                text = "*Chart*",
-                style = MaterialTheme.typography.headlineLarge
-            )
+//            Text(
+//                modifier = Modifier
+//                    .weight(1f)
+//                    .clip(RoundedCornerShape(24.dp))
+//                    .fillMaxWidth()
+//                    .background(MaterialTheme.colorScheme.secondaryContainer),
+//                textAlign = TextAlign.Center,
+//                text = "*Chart*",
+//                style = MaterialTheme.typography.headlineLarge
+//            )
 
             LazyColumn(
                 modifier = Modifier

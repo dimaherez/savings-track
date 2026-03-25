@@ -2,8 +2,7 @@ package com.dmytroherez.savingstrack.core.di
 
 import com.dmytroherez.savingstrack.MainViewModel
 import com.dmytroherez.savingstrack.presentation.auth.AuthViewModel
-import com.dmytroherez.savingstrack.presentation.crypto.CryptoViewModel
-import com.dmytroherez.savingstrack.presentation.fiat.FiatViewModel
+import com.dmytroherez.savingstrack.presentation.savings.SavingsViewModel
 import com.dmytroherez.savingstrack.presentation.home.HomeViewModel
 import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
@@ -43,8 +42,7 @@ val presentationModule = module {
     ) }
 
     factoryOf(::HomeViewModel)
-    factoryOf(::FiatViewModel)
-    factoryOf(::CryptoViewModel)
+    factoryOf(::SavingsViewModel)
     factoryOf(::IncomeViewModel)
 }
 

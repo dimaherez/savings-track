@@ -15,12 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
@@ -31,13 +28,9 @@ import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.dmytroherez.savingstrack.presentation.auth.AuthScreen
-import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
-import com.dmytroherez.savingstrack.presentation.crypto.CryptoTab
-import com.dmytroherez.savingstrack.presentation.fiat.FiatTab
+import com.dmytroherez.savingstrack.presentation.savings.SavingsTab
 import com.dmytroherez.savingstrack.presentation.home.HomeTab
 import com.dmytroherez.savingstrack.presentation.income.IncomeTab
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -91,8 +84,8 @@ data object MainScreen : Screen {
                 bottomBar = {
                     NavigationBar {
                         TabNavigationItem(HomeTab)
-                        TabNavigationItem(FiatTab)
-                        TabNavigationItem(CryptoTab)
+                        TabNavigationItem(SavingsTab)
+//                        TabNavigationItem(CryptoTab)
                         TabNavigationItem(IncomeTab)
                     }
                 },
