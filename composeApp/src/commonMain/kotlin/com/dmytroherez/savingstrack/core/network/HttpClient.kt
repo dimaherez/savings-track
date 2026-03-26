@@ -1,7 +1,6 @@
 package com.dmytroherez.savingstrack.core.network
 
-import dev.gitlive.firebase.Firebase
-import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.auth.FirebaseAuth
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -17,7 +16,10 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-fun createHttpClient(baseUrl: String) = HttpClient {
+fun createHttpClient(
+    baseUrl: String,
+    firebaseAuth: FirebaseAuth
+) = HttpClient {
 
     install(ContentNegotiation) {
         json(Json {
@@ -40,7 +42,7 @@ fun createHttpClient(baseUrl: String) = HttpClient {
     install(Auth) {
         bearer {
             loadTokens {
-                val user = Firebase.auth.currentUser
+                val user = firebaseAuth.currentUser
                 println("AUTH loadTokens: currentUser=${user?.uid}, getting token...")
                 val token = user?.getIdToken(forceRefresh = false)
                 println("AUTH loadTokens: token=${if (token != null) "obtained (${token.take(20)}...)" else "NULL"}")
@@ -51,7 +53,7 @@ fun createHttpClient(baseUrl: String) = HttpClient {
                 }
             }
             refreshTokens {
-                val user = Firebase.auth.currentUser
+                val user = firebaseAuth.currentUser
                 println("AUTH refreshTokens: currentUser=${user?.uid}, force-refreshing token...")
                 val token = user?.getIdToken(forceRefresh = true)
                 println("AUTH refreshTokens: token=${if (token != null) "obtained (${token.take(20)}...)" else "NULL"}")

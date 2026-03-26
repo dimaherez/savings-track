@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack.routing
 
+import com.dmytroherez.savingstrack.Constants.JWT_NAME
 import com.dmytroherez.savingstrack.data.repo.SavingsRepository
 import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
 import com.dmytroherez.savingstrack.withSecureUid
@@ -12,23 +13,24 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 
 fun Routing.postSaving(repository: SavingsRepository) {
-    authenticate("firebase-auth") {
-        post("/savings") {
+    authenticate(JWT_NAME) {
+        post("/savings/add") {
             withSecureUid { uid ->
-                val newSaving = call.receive<PostSavingRequest>()
-                val generatedId = repository.addSaving(uid, newSaving)
-                call.respond(HttpStatusCode.Created, mapOf("id" to generatedId))
+                repository.addSaving(uid, call.receive<PostSavingRequest>())
+                call.respond(HttpStatusCode.Created)
             }
         }
     }
 }
 
 fun Routing.getAllSavings(repository: SavingsRepository) {
-    authenticate("firebase-auth") {
+    authenticate(JWT_NAME) {
         get("/savings/list") {
             withSecureUid { uid ->
-                val savingsList = repository.getAllSavings(uid)
-                call.respond(HttpStatusCode.OK, savingsList)
+                call.respond(
+                    status = HttpStatusCode.OK,
+                    message = repository.getAllSavings(uid)
+                )
             }
         }
     }

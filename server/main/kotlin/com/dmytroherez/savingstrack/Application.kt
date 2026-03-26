@@ -1,6 +1,10 @@
 package com.dmytroherez.savingstrack
 
 import com.auth0.jwk.JwkProviderBuilder
+import com.dmytroherez.savingstrack.Constants.FIREBASE_PROJECT_ID
+import com.dmytroherez.savingstrack.Constants.JWK_PROVIDER_URL
+import com.dmytroherez.savingstrack.Constants.JWT_NAME
+import com.dmytroherez.savingstrack.Constants.JWT_PROVIDER_ISSUER_URL
 import java.net.URI
 import com.dmytroherez.savingstrack.data.tables.SavingsTable
 import com.zaxxer.hikari.HikariConfig
@@ -46,20 +50,18 @@ fun Application.module() {
 }
 
 private fun Application.installAuth() {
-    val firebaseProjectId = "savingstrack-669e8"
-
     val jwkProvider =
-        JwkProviderBuilder(URI("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com").toURL())
+        JwkProviderBuilder(URI(JWK_PROVIDER_URL).toURL())
             .cached(10, 24, TimeUnit.HOURS)
             .build()
 
     install(Authentication) {
-        jwt("firebase-auth") {
-            verifier(jwkProvider, "https://securetoken.google.com/$firebaseProjectId") {
+        jwt(JWT_NAME) {
+            verifier(jwkProvider, JWT_PROVIDER_ISSUER_URL) {
                 acceptLeeway(3)
             }
             validate { credential ->
-                if (credential.payload.audience.contains(firebaseProjectId)) {
+                if (credential.payload.audience.contains(FIREBASE_PROJECT_ID)) {
                     JWTPrincipal(credential.payload)
                 } else {
                     null

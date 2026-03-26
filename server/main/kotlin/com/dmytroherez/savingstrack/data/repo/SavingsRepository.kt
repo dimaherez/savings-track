@@ -20,8 +20,8 @@ class SavingsRepository {
         suspendTransaction { block() }
     }
 
-    suspend fun addSaving(uid: String, saving: PostSavingRequest): Int {
-        return dbQuery {
+    suspend fun addSaving(uid: String, saving: PostSavingRequest) {
+        dbQuery {
             SavingsTable.insert {
                 it[currency] = saving.currency
                 it[amount] = saving.amount

@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack.data.repoimpl
 
+import co.touchlab.kermit.Logger
 import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
 import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
 import com.dmytroherez.savingstrack.dto.savings.SavingItem
@@ -18,7 +19,7 @@ class SavingsRepoImpl(
         description: String?
     ): Result<Unit> {
         return try {
-            httpClient.post("savings") {
+            httpClient.post("savings/add") {
                 setBody(
                     PostSavingRequest(
                         currency = currency,
@@ -29,7 +30,7 @@ class SavingsRepoImpl(
             }
             Result.success(Unit)
         } catch (e: Exception) {
-            println("Network error: ${e.message}")
+            Logger.e(e) { "SavingsRepoImpl.postSaving()" }
             Result.failure(e)
         }
     }
@@ -39,7 +40,7 @@ class SavingsRepoImpl(
             val response = httpClient.get("savings/list")
             Result.success(response.body())
         } catch (e: Exception) {
-            println("Network error: ${e.message}")
+            Logger.e(e) { "SavingsRepoImpl.getSavings()" }
             Result.failure(e)
         }
     }

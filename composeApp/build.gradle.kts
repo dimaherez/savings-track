@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
-import org.gradle.kotlin.dsl.project
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -43,6 +41,9 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+
+            // logs
+            implementation(libs.kermit)
 
             // Datastore
             implementation(libs.androidx.datastore.preferences)

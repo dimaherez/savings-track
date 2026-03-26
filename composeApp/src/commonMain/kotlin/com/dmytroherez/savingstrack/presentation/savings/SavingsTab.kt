@@ -36,10 +36,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.dmytroherez.savingstrack.MainScreen
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
 import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
-import com.dmytroherez.savingstrack.presentation.auth.AuthEvent
 import kotlinx.coroutines.launch
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
