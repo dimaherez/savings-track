@@ -7,7 +7,7 @@ import kotlin.time.ExperimentalTime
 
 object SavingsTable : Table("savings") {
     val id = integer("id").autoIncrement()
-    val userId = varchar("userId", 255)
+    val userId = varchar("userId", 128)
     val currency = varchar("currency", 10)
     val amount = double("amount")
     val description = varchar("description", 255).nullable()

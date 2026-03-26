@@ -1,13 +1,12 @@
 package com.dmytroherez.savingstrack.domain.repo
 
-import com.dmytroherez.savingstrack.dto.savings.GetSavingsResponseItem
+import com.dmytroherez.savingstrack.dto.savings.SavingItem
 
 interface SavingsRepo {
     suspend fun postSaving(
-        userId: String,
         currency: String,
         amount: Double,
         description: String? = null
     ): Result<Unit>
-    suspend fun getSavings(): Result<List<GetSavingsResponseItem>>
+    suspend fun getSavings(): Result<List<SavingItem>>
 }

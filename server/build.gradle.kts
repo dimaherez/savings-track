@@ -32,6 +32,10 @@ dependencies {
 
     implementation(libs.ktor.serialization.kotlinx.json)
 
+    // logging
+    implementation(libs.ktor.server.call.logging)
+    implementation(libs.logback.classic)
+
     // Database
     implementation(libs.postgresql)
     implementation(libs.hikaricp)
@@ -40,6 +44,11 @@ dependencies {
     implementation(libs.exposed.kotlin.datetime)
     implementation(libs.exposed.jdbc)
     implementation(libs.ktor.server.content.negotiation)
+
+    // jwt token
+    implementation(libs.ktor.server.auth.jvm)
+    implementation(libs.ktor.server.auth.jwt.jvm)
+    implementation(libs.jwks.rsa)
 
     implementation(project(":shared"))
 }

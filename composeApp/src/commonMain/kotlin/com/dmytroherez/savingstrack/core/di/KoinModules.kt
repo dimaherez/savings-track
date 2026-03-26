@@ -6,6 +6,7 @@ import com.dmytroherez.savingstrack.presentation.savings.SavingsViewModel
 import com.dmytroherez.savingstrack.presentation.home.HomeViewModel
 import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
+import com.dmytroherez.savingstrack.core.network.createHttpClient
 import com.dmytroherez.savingstrack.data.repoimpl.AuthRepoImpl
 import com.dmytroherez.savingstrack.data.repoimpl.SavingsRepoImpl
 import com.dmytroherez.savingstrack.domain.repo.AuthRepo
@@ -23,9 +24,15 @@ expect val platformDataStoreModule: Module
 
 val dataModule = module {
     single { DataStoreRepo(dataStore = get()) }
+    single {
+        "http://192.168.0.96:8080"
+//        "http://10.10.10.110:8080"
+    }
+
+    single { createHttpClient(baseUrl = get()) }
 
     single<AuthRepo> { AuthRepoImpl() }
-    single<SavingsRepo> { SavingsRepoImpl() }
+    single<SavingsRepo> { SavingsRepoImpl(httpClient = get()) }
 }
 
 val domainModule = module {

@@ -5,7 +5,7 @@ import com.dmytroherez.savingstrack.data.tables.SavingsTable.amount
 import com.dmytroherez.savingstrack.data.tables.SavingsTable.createdAt
 import com.dmytroherez.savingstrack.data.tables.SavingsTable.currency
 import com.dmytroherez.savingstrack.data.tables.SavingsTable.description
-import com.dmytroherez.savingstrack.dto.savings.GetSavingsResponseItem
+import com.dmytroherez.savingstrack.dto.savings.SavingItem
 import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,25 +20,25 @@ class SavingsRepository {
         suspendTransaction { block() }
     }
 
-    suspend fun addSaving(saving: PostSavingRequest): Int {
+    suspend fun addSaving(uid: String, saving: PostSavingRequest): Int {
         return dbQuery {
             SavingsTable.insert {
                 it[currency] = saving.currency
                 it[amount] = saving.amount
                 it[description] = saving.description
-                it[userId] = saving.userId
+                it[userId] = uid
             }[SavingsTable.id]
         }
     }
 
     @OptIn(ExperimentalTime::class)
-    suspend fun getAllSavings(userId: String): List<GetSavingsResponseItem> {
+    suspend fun getAllSavings(userId: String): List<SavingItem> {
         return dbQuery {
             SavingsTable
                 .selectAll()
                 .where { SavingsTable.userId eq userId }
                 .map {
-                    GetSavingsResponseItem(
+                    SavingItem(
                         id = it[SavingsTable.id],
                         currency = it[currency],
                         amount = it[amount],
