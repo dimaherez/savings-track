@@ -4,5 +4,5 @@ import com.dmytroherez.savingstrack.core.presentation.BaseUiEvent
 import com.dmytroherez.savingstrack.core.presentation.UiText
 
 sealed interface SavingsEvent : BaseUiEvent {
-    data class ShowErrorToast(val message: UiText) : SavingsEvent
+    data class ShowToast(val message: UiText) : SavingsEvent
 }

@@ -16,6 +16,7 @@ object Constants {
     const val FIELD_CURRENCY = "currency"
     const val FIELD_AMOUNT = "amount"
     const val FIELD_DESCRIPTION = "description"
+    const val FIELD_CATEGORY = "category"
     const val FIELD_CREATED_AT = "createdAt"
 
 

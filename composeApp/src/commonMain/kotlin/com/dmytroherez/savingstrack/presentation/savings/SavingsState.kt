@@ -1,14 +1,12 @@
 package com.dmytroherez.savingstrack.presentation.savings
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiState
+import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
 import com.dmytroherez.savingstrack.dto.savings.SavingItem
 
-data class FiatState(
-    val something: String = "",
-    val cryptoSavings: CryptoSavings = CryptoSavings,
-    val fiatSavings: FiatSavings = FiatSavings,
-    val savings: List<SavingItem> = emptyList()
+data class SavingsState(
+    val savings: List<SavingItem> = emptyList(),
+    val showAddSavingDialog: Boolean = false,
+    val isAddSavingLoading: Boolean = false,
+    val isSavingsListLoading: Boolean = false
 ) : BaseUiState
-
-data object CryptoSavings
-data object FiatSavings

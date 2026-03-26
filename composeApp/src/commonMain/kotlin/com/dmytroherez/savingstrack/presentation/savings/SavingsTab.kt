@@ -1,6 +1,7 @@
 package com.dmytroherez.savingstrack.presentation.savings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,20 +11,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,13 +50,16 @@ import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
+import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
+import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
+import com.dmytroherez.savingstrack.dto.savings.SavingCategory
 import kotlinx.coroutines.launch
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
-object SavingsTab: Tab {
+object SavingsTab : Tab {
     override val options: TabOptions
         @Composable
         get() = remember {
@@ -68,7 +84,7 @@ object SavingsTab: Tab {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is SavingsEvent.ShowErrorToast -> {
+                        is SavingsEvent.ShowToast -> {
                             showToast(event.message.asStringSuspend())
                         }
                     }
@@ -95,16 +111,12 @@ object SavingsTab: Tab {
                 }
             }
 
-            val data = when(SavingsPagerTab.entries[pagerState.currentPage]) {
-                SavingsPagerTab.FIAT -> state.fiatSavings
-                SavingsPagerTab.CRYPTO -> state.cryptoSavings
-            }
-
             HorizontalPager(
                 state = pagerState
             ) {
                 FiatScreenContent(
                     state = state,
+                    pagerState = pagerState,
                     onAction = viewModel::onAction
                 )
             }
@@ -115,7 +127,8 @@ object SavingsTab: Tab {
 
 @Composable
 private fun FiatScreenContent(
-    state: FiatState,
+    state: SavingsState,
+    pagerState: PagerState,
     onAction: (SavingsAction) -> Unit = {}
 ) {
     Box {
@@ -160,53 +173,164 @@ private fun FiatScreenContent(
                     .clip(RoundedCornerShape(24.dp))
                     .weight(1f)
             ) {
-                state.savings.forEach { savingItem ->
-                    item {
-                        Row (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Currency${savingItem.currency}")
-                            Text("Value${savingItem.amount}")
-                        }
-                    }
-                }
-//                items(4) {
-//                    Row (
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(vertical = 8.dp),
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//                        Text("Currency$it")
-//                        Text("Value$it")
-//                    }
-//                }
+                listItems(state, pagerState)
             }
         }
 
-        Text(
+        if (state.isSavingsListLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
+
+        AddSavingDialog(
+            isVisible = state.showAddSavingDialog,
+            onAddClick = { request -> onAction(SavingsAction.PostSaving(request)) },
+            onDismissRequest = { onAction(SavingsAction.ToggleAddSavingDialog) }
+        )
+
+        TextButton(
             modifier = Modifier
                 .padding(end = 36.dp, bottom = 36.dp)
                 .align(Alignment.BottomEnd)
                 .clip(CircleShape)
                 .size(48.dp)
                 .background(color = MaterialTheme.colorScheme.primary),
-            text = "+",
-            style = MaterialTheme.typography.headlineLarge,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-        )
+            onClick = {
+                onAction(SavingsAction.ToggleAddSavingDialog)
+            }
+        ) {
+            Text(
+                text = "+",
+                style = MaterialTheme.typography.headlineLarge,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+        }
 
     }
+}
+
+private fun LazyListScope.listItems(
+    state: SavingsState,
+    pagerState: PagerState
+) {
+    state.savings
+        .filter { item ->
+            when (SavingsPagerTab.entries[pagerState.currentPage]) {
+                SavingsPagerTab.FIAT -> item.category == SavingCategory.FIAT
+                SavingsPagerTab.CRYPTO -> item.category == SavingCategory.CRYPTO
+            }
+        }
+        .forEach { savingItem ->
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Currency${savingItem.currency}")
+                    Text("Value${savingItem.amount}")
+                }
+            }
+        }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddSavingDialog(
+    isVisible: Boolean,
+    onAddClick: (PostSavingRequest) -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    if (isVisible.not()) return
+
+    var amount by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var selectedCurrency by remember { mutableStateOf("") }
+    var dropdownExpanded by remember { mutableStateOf(false) }
+
+    val availableCurrencies = listOf("USD", "EUR", "GBP", "UAH", "JPY")
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .clickable(
+                onClick = onDismissRequest
+            )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+                .background(MaterialTheme.colorScheme.background),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            ExposedDropdownMenuBox(
+                expanded = dropdownExpanded,
+                onExpandedChange = { dropdownExpanded = !dropdownExpanded }
+            ) {
+                OutlinedTextField(
+                    value = selectedCurrency,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Currency") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded) },
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = dropdownExpanded,
+                    onDismissRequest = { dropdownExpanded = false }
+                ) {
+                    availableCurrencies.forEach { currency ->
+                        DropdownMenuItem(
+                            text = { Text(currency) },
+                            onClick = {
+                                selectedCurrency = currency
+                                dropdownExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Amount Input
+            OutlinedTextField(
+                value = amount,
+                onValueChange = { amount = it },
+                label = { Text("Amount") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Description Input (Optional)
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Description (Optional)") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            ButtonPrimary(
+                text = "Save",
+                onClick = {
+                    onAddClick(
+                        PostSavingRequest(
+                            currency = selectedCurrency,
+                            amount = amount.toDoubleOrNull() ?: 0.0,
+                            description = description,
+                            category = SavingCategory.FIAT
+                        )
+                    )
+                }
+            )
+        }
+    }
+
 }
 
 @Preview
 @Composable
 private fun FiatScreenContentPreview() = PreviewWithTheme {
     FiatScreenContent(
-        state = FiatState()
+        state = SavingsState(),
+        pagerState = rememberPagerState { 0 }
     )
 }

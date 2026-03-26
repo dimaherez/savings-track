@@ -7,4 +7,6 @@
 
     <string name="fiat">Fiat</string>
     <string name="crypto">Crypto</string>
+
+    <string name="success">Success</string>
 </resources>

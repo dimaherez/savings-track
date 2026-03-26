@@ -12,5 +12,6 @@ data class SavingItem(
     val currency: String,
     val amount: Double,
     val description: String? = null,
+    val category: SavingCategory,
     val createdAt: Instant
 )

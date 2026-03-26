@@ -2,6 +2,7 @@ package com.dmytroherez.savingstrack.data.repo
 
 import com.dmytroherez.savingstrack.data.tables.SavingsTable
 import com.dmytroherez.savingstrack.data.tables.SavingsTable.amount
+import com.dmytroherez.savingstrack.data.tables.SavingsTable.category
 import com.dmytroherez.savingstrack.data.tables.SavingsTable.createdAt
 import com.dmytroherez.savingstrack.data.tables.SavingsTable.currency
 import com.dmytroherez.savingstrack.data.tables.SavingsTable.description
@@ -27,6 +28,7 @@ class SavingsRepository {
                 it[amount] = saving.amount
                 it[description] = saving.description
                 it[userId] = uid
+                it[category] = saving.category
             }[SavingsTable.id]
         }
     }
@@ -44,7 +46,8 @@ class SavingsRepository {
                         amount = it[amount],
                         userId = it[SavingsTable.userId],
                         description = it[description],
-                        createdAt = it[createdAt]
+                        createdAt = it[createdAt],
+                        category = it[category]
                     )
                 }
         }

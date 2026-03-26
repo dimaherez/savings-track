@@ -14,19 +14,11 @@ class SavingsRepoImpl(
     private val httpClient: HttpClient
 ) : SavingsRepo {
     override suspend fun postSaving(
-        currency: String,
-        amount: Double,
-        description: String?
+        request: PostSavingRequest
     ): Result<Unit> {
         return try {
             httpClient.post("savings/add") {
-                setBody(
-                    PostSavingRequest(
-                        currency = currency,
-                        amount = amount,
-                        description = description
-                    )
-                )
+                setBody(request)
             }
             Result.success(Unit)
         } catch (e: Exception) {
