@@ -51,6 +51,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
+import com.dmytroherez.savingstrack.core.utils.formatAsFiat
 import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
 import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
 import com.dmytroherez.savingstrack.dto.savings.SavingCategory
@@ -230,8 +231,8 @@ private fun LazyListScope.listItems(
                         .padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Currency${savingItem.currency}")
-                    Text("Value${savingItem.amount}")
+                    Text(savingItem.currency)
+                    Text(formatAsFiat(savingItem.amount, savingItem.currency))
                 }
             }
         }
