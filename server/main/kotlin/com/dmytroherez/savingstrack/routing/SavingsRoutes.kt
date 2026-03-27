@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack.routing
 
+import com.dmytroherez.savingstrack.Constants.FIELD_CURRENCY
 import com.dmytroherez.savingstrack.Constants.JWT_NAME
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
@@ -31,11 +32,19 @@ fun Routing.transactionsRoutes() {
                 }
             }
 
-            get(PATH_TRANSACTIONS_LIST_TRANSACTIONS) {
+            get("$PATH_TRANSACTIONS_LIST_TRANSACTIONS/{$FIELD_CURRENCY}") {
                 withSecureUid { uid ->
-                    call.respond(
-                        status = HttpStatusCode.OK,
-                        message = repository.getAllTransactions(uid)
+                    call.pathParameters[FIELD_CURRENCY]?.let { currency ->
+                        call.respond(
+                            status = HttpStatusCode.OK,
+                            message = repository.getAllTransactions(
+                                userId = uid,
+                                currency = currency
+                            )
+                        )
+                    } ?: call.respond(
+                        status = HttpStatusCode.BadRequest,
+                        message = "Currency is not provided"
                     )
                 }
             }

@@ -14,13 +14,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -33,6 +36,8 @@ import com.dmytroherez.savingstrack.presentation.home.HomeTab
 import com.dmytroherez.savingstrack.presentation.income.IncomeTab
 import org.koin.compose.viewmodel.koinViewModel
 
+val LocalRootNavigator = staticCompositionLocalOf<Navigator?> { null }
+
 @Composable
 fun MainApp() {
     MaterialTheme {
@@ -41,7 +46,11 @@ fun MainApp() {
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 color = MaterialTheme.colorScheme.background
             ) {
-                Navigator(SplashScreen())
+                Navigator(SplashScreen()){ navigator ->
+                    CompositionLocalProvider(LocalRootNavigator provides navigator) {
+                        CurrentScreen()
+                    }
+                }
             }
         }
     }
@@ -77,9 +86,7 @@ data object MainScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
-        TabNavigator(HomeTab) {
-            val tabNavigator = LocalTabNavigator.current
-
+        TabNavigator(HomeTab) { tabNavigator ->
             Scaffold(
                 bottomBar = {
                     NavigationBar {

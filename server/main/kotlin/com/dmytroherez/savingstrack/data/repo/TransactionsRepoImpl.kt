@@ -15,6 +15,7 @@ import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -41,15 +42,19 @@ class TransactionsRepoImpl : TransactionsRepo {
     }
 
     @OptIn(ExperimentalTime::class)
-    override suspend fun getAllTransactions(userId: String): List<TransactionItem> {
+    override suspend fun getAllTransactions(
+        userId: String,
+        currency: String
+    ): List<TransactionItem> {
         return dbQuery {
             TransactionsTable
                 .selectAll()
-                .where { TransactionsTable.userId eq userId }
+                .where { (TransactionsTable.userId eq userId) and (TransactionsTable.currency eq currency)}
+                .orderBy(createdAt, SortOrder.DESC)
                 .map {
                     TransactionItem(
                         id = it[TransactionsTable.id],
-                        currency = it[currency],
+                        currency = it[TransactionsTable.currency],
                         amount = it[amount],
                         userId = it[TransactionsTable.userId],
                         description = it[description],

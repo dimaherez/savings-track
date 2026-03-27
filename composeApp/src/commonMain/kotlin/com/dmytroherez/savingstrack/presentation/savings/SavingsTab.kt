@@ -49,12 +49,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.dmytroherez.savingstrack.LocalRootNavigator
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
 import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
+import com.dmytroherez.savingstrack.presentation.transactions.TransactionsScreen
 import kotlinx.coroutines.launch
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -74,6 +76,8 @@ object SavingsTab : Tab {
 
     @Composable
     override fun Content() {
+        val rootNavigator = LocalRootNavigator.current
+
         val coroutineScope = rememberCoroutineScope()
         val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -117,10 +121,13 @@ object SavingsTab : Tab {
             HorizontalPager(
                 state = pagerState
             ) {
-                FiatScreenContent(
+                SavingsScreenContent(
                     state = state,
                     pagerState = pagerState,
-                    onAction = viewModel::onAction
+                    onAction = viewModel::onAction,
+                    onNavigateToCurrencyTransactions = { currency ->
+                        rootNavigator?.push(TransactionsScreen(currency))
+                    }
                 )
             }
         }
@@ -129,10 +136,11 @@ object SavingsTab : Tab {
 }
 
 @Composable
-private fun FiatScreenContent(
+private fun SavingsScreenContent(
     state: SavingsState,
     pagerState: PagerState,
-    onAction: (SavingsAction) -> Unit = {}
+    onAction: (SavingsAction) -> Unit = {},
+    onNavigateToCurrencyTransactions: (currency: String) -> Unit = {}
 ) {
     Box {
         Column(
@@ -176,8 +184,12 @@ private fun FiatScreenContent(
                     .clip(RoundedCornerShape(24.dp))
                     .weight(1f)
             ) {
+                val category = SavingCategory.entries[pagerState.currentPage]
                 listItems(
-                    currencyTotals = state.savings?.categories[SavingCategory.entries[pagerState.currentPage]] ?: emptyList()
+                    currencyTotals = state.savings?.categories[category] ?: emptyList(),
+                    onViewAllClick = { currency ->
+                        onNavigateToCurrencyTransactions(currency)
+                    }
                 )
             }
         }
@@ -218,7 +230,8 @@ private fun FiatScreenContent(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 private fun LazyListScope.listItems(
-    currencyTotals: List<CurrencyTotal>
+    currencyTotals: List<CurrencyTotal>,
+    onViewAllClick: (currency: String) -> Unit
 ) {
     currencyTotals
         .forEach { savingItem ->
@@ -262,11 +275,15 @@ private fun LazyListScope.listItems(
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        text = "View all",
-                                        color = MaterialTheme.colorScheme.primary
+                                        modifier = Modifier.fillMaxSize(),
+                                        text = "View all transactions",
+                                        color = MaterialTheme.colorScheme.primary,
+                                        textAlign = TextAlign.Center
                                     )
                                 },
-                                onClick = {}
+                                onClick = {
+                                    onViewAllClick(savingItem.currency)
+                                }
                             )
                         }
                     }
@@ -366,7 +383,7 @@ private fun AddSavingDialog(
 @Preview
 @Composable
 private fun FiatScreenContentPreview() = PreviewWithTheme {
-    FiatScreenContent(
+    SavingsScreenContent(
         state = SavingsState(),
         pagerState = rememberPagerState { 0 }
     )

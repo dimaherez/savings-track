@@ -32,9 +32,9 @@ class SavingsRepoImpl(
         }
     }
 
-    override suspend fun getSavings(): Result<List<TransactionItem>> {
+    override suspend fun getSavings(currency: String): Result<List<TransactionItem>> {
         return try {
-            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_LIST_TRANSACTIONS")
+            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_LIST_TRANSACTIONS/$currency")
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "SavingsRepoImpl.getSavings()" }

@@ -15,8 +15,9 @@ import com.dmytroherez.savingstrack.domain.usecase.auth.GetCurrentUserUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.LoginUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.RegisterUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
-import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsUC
+import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
+import com.dmytroherez.savingstrack.presentation.transactions.TransactionsViewModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import org.koin.core.module.Module
@@ -43,7 +44,7 @@ val domainModule = module {
     singleOf(::RegisterUC)
     singleOf(::LoginUC)
     singleOf(::GetCurrentUserUC)
-    singleOf(::GetSavingsUC)
+    singleOf(::GetTransactionsUC)
     singleOf(::PostSavingUC)
     singleOf(::GetSavingsDashboardUC)
 }
@@ -60,9 +61,13 @@ val presentationModule = module {
     ) }
 
     viewModel { SavingsViewModel(
-        getSavingsUC = get(),
+        getTransactionsUC = get(),
         postSavingUC = get(),
         getSavingsDashboardUC = get()
+    ) }
+
+    viewModel { TransactionsViewModel(
+        getTransactionsUC = get()
     ) }
 
     viewModelOf(::HomeViewModel)
