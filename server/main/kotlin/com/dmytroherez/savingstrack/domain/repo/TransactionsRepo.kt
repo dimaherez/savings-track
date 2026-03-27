@@ -3,9 +3,8 @@ package com.dmytroherez.savingstrack.domain.repo
 import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.savings.TransactionItem
 
-interface SavingsRepo {
-    suspend fun postSaving(
-        request: PostTransactionRequest
-    ): Result<Unit>
-    suspend fun getSavings(): Result<List<TransactionItem>>
+interface TransactionsRepo {
+    suspend fun addTransaction(uid: String, transaction: PostTransactionRequest)
+    suspend fun getAllTransactions(userId: String): List<TransactionItem>
+
 }

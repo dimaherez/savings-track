@@ -32,6 +32,10 @@ dependencies {
 
     implementation(libs.ktor.serialization.kotlinx.json)
 
+    // Koin
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.ktor)
+
     // logging
     implementation(libs.ktor.server.call.logging)
     implementation(libs.logback.classic)

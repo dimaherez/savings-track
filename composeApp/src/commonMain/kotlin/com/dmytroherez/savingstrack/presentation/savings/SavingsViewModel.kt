@@ -5,7 +5,7 @@ import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.UiText
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
-import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
+import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ class SavingsViewModel(
         }
     }
 
-    private fun postSaving(request: PostSavingRequest) {
+    private fun postSaving(request: PostTransactionRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             updateState { it.copy(isAddSavingLoading = true) }
             postSavingUC(request)

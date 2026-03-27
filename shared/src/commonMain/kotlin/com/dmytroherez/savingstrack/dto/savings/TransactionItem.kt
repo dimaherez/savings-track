@@ -6,7 +6,7 @@ import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 @Serializable
-data class SavingItem(
+data class TransactionItem(
     val id: Int,
     val userId: String,
     val currency: String,

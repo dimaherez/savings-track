@@ -7,14 +7,14 @@ import com.dmytroherez.savingstrack.Constants.FIELD_CATEGORY
 import com.dmytroherez.savingstrack.Constants.FIELD_CURRENCY
 import com.dmytroherez.savingstrack.Constants.FIELD_DESCRIPTION
 import com.dmytroherez.savingstrack.Constants.FIELD_CREATED_AT
-import com.dmytroherez.savingstrack.Constants.TABLE_SAVINGS
+import com.dmytroherez.savingstrack.Constants.TABLE_TRANSACTIONS
 import com.dmytroherez.savingstrack.dto.savings.SavingCategory
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.datetime.CurrentTimestamp
 import org.jetbrains.exposed.v1.datetime.timestamp
 import kotlin.time.ExperimentalTime
 
-object SavingsTable : Table(TABLE_SAVINGS) {
+object TransactionsTable : Table(TABLE_TRANSACTIONS) {
     val id = integer(FIELD_ID).autoIncrement()
     val userId = varchar(FIELD_USER_ID, 128)
     val currency = varchar(FIELD_CURRENCY, 10)

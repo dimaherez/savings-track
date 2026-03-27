@@ -53,7 +53,7 @@ import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithThem
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
 import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
-import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
+import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.savings.SavingCategory
 import kotlinx.coroutines.launch
 import multiplatform.network.cmptoast.showToast
@@ -242,7 +242,7 @@ private fun LazyListScope.listItems(
 @Composable
 private fun AddSavingDialog(
     isVisible: Boolean,
-    onAddClick: (PostSavingRequest) -> Unit,
+    onAddClick: (PostTransactionRequest) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     if (isVisible.not()) return
@@ -313,7 +313,7 @@ private fun AddSavingDialog(
                 text = "Save",
                 onClick = {
                     onAddClick(
-                        PostSavingRequest(
+                        PostTransactionRequest(
                             currency = selectedCurrency,
                             amount = amount.toDoubleOrNull() ?: 0.0,
                             description = description,

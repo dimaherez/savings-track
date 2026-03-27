@@ -5,8 +5,8 @@ import com.dmytroherez.savingstrack.Constants.FIREBASE_PROJECT_ID
 import com.dmytroherez.savingstrack.Constants.JWK_PROVIDER_URL
 import com.dmytroherez.savingstrack.Constants.JWT_NAME
 import com.dmytroherez.savingstrack.Constants.JWT_PROVIDER_ISSUER_URL
-import java.net.URI
-import com.dmytroherez.savingstrack.data.tables.SavingsTable
+import com.dmytroherez.savingstrack.data.tables.TransactionsTable
+import com.dmytroherez.savingstrack.di.appModule
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.serialization.kotlinx.json.json
@@ -24,7 +24,9 @@ import io.ktor.server.response.respond
 import org.jetbrains.exposed.v1.jdbc.Database
 import org.jetbrains.exposed.v1.jdbc.SchemaUtils
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.koin.ktor.plugin.Koin
 import org.slf4j.event.Level
+import java.net.URI
 import java.util.concurrent.TimeUnit
 
 fun main() {
@@ -40,6 +42,10 @@ fun Application.module() {
 
     install(ContentNegotiation) {
         json()
+    }
+
+    install(Koin) {
+        modules(appModule)
     }
 
     installAuth()
@@ -89,6 +95,6 @@ private fun initDatabase() {
     Database.connect(HikariDataSource(config))
 
     transaction {
-        SchemaUtils.create(SavingsTable)
+        SchemaUtils.create(TransactionsTable)
     }
 }

@@ -2,8 +2,11 @@ package com.dmytroherez.savingstrack.data.repoimpl
 
 import co.touchlab.kermit.Logger
 import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
-import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
-import com.dmytroherez.savingstrack.dto.savings.SavingItem
+import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.savings.TransactionItem
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_LIST_TRANSACTIONS
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_POST_TRANSACTION
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_PREFIX
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -14,10 +17,10 @@ class SavingsRepoImpl(
     private val httpClient: HttpClient
 ) : SavingsRepo {
     override suspend fun postSaving(
-        request: PostSavingRequest
+        request: PostTransactionRequest
     ): Result<Unit> {
         return try {
-            httpClient.post("savings/add") {
+            httpClient.post("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_POST_TRANSACTION") {
                 setBody(request)
             }
             Result.success(Unit)
@@ -27,9 +30,9 @@ class SavingsRepoImpl(
         }
     }
 
-    override suspend fun getSavings(): Result<List<SavingItem>> {
+    override suspend fun getSavings(): Result<List<TransactionItem>> {
         return try {
-            val response = httpClient.get("savings/list")
+            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_LIST_TRANSACTIONS")
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "SavingsRepoImpl.getSavings()" }

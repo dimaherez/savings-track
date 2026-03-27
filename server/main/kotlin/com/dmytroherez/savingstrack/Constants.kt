@@ -8,7 +8,7 @@ object Constants {
     const val JWT_PROVIDER_ISSUER_URL = "https://securetoken.google.com/$FIREBASE_PROJECT_ID"
 
     // Tables
-    const val TABLE_SAVINGS = "Savings"
+    const val TABLE_TRANSACTIONS = "Transactions"
 
     // Table fields
     const val FIELD_ID = "id"

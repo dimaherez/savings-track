@@ -1,11 +1,11 @@
 package com.dmytroherez.savingstrack.domain.usecase.savings
 
 import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
-import com.dmytroherez.savingstrack.dto.savings.PostSavingRequest
+import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
 
 class PostSavingUC (private val savingsRepo: SavingsRepo) {
     suspend operator fun invoke(
-        request: PostSavingRequest
+        request: PostTransactionRequest
     ) = savingsRepo.postSaving(
         request = request
     )
