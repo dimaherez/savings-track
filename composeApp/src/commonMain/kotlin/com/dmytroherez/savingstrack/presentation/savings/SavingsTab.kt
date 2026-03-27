@@ -59,6 +59,7 @@ import kotlinx.coroutines.launch
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.ExperimentalTime
 
 object SavingsTab : Tab {
     override val options: TabOptions
@@ -80,7 +81,6 @@ object SavingsTab : Tab {
         val state by viewModel.state.collectAsStateWithLifecycle()
 
         val tabs = SavingCategory.entries.take(2)
-
         val pagerState = rememberPagerState { tabs.size }
 
         LaunchedEffect(lifecycleOwner.lifecycle) {
@@ -177,7 +177,7 @@ private fun FiatScreenContent(
                     .weight(1f)
             ) {
                 listItems(
-                    currencyTotals = state.savings?.categories[SavingCategory.entries[pagerState.currentPage]]?.currencyTotals ?: emptyList()
+                    currencyTotals = state.savings?.categories[SavingCategory.entries[pagerState.currentPage]] ?: emptyList()
                 )
             }
         }
@@ -216,20 +216,60 @@ private fun FiatScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 private fun LazyListScope.listItems(
     currencyTotals: List<CurrencyTotal>
 ) {
     currencyTotals
         .forEach { savingItem ->
             item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                var dropdownExpanded by remember { mutableStateOf(false) }
+                ExposedDropdownMenuBox(
+                    expanded = dropdownExpanded,
+                    onExpandedChange = { dropdownExpanded = !dropdownExpanded }
                 ) {
-                    Text(savingItem.currency)
-                    Text(formatAsFiat(savingItem.totalAmount, savingItem.currency))
+                    Row(
+                        modifier = Modifier
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(savingItem.currency)
+                        Text(formatAsFiat(savingItem.totalAmount, savingItem.currency))
+                    }
+                    ExposedDropdownMenu(
+                        expanded = dropdownExpanded,
+                        onDismissRequest = { dropdownExpanded = false }
+                    ) {
+                        savingItem.recentTransactions.forEach { transaction ->
+                            DropdownMenuItem(
+                                text = {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(transaction.createdAt.toString())
+                                        Text(formatAsFiat(transaction.amount, savingItem.currency, showSign = true))
+                                    }
+                                },
+                                onClick = {}
+                            )
+                        }
+                        if (savingItem.hasMoreTransactions) {
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = "View all",
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = {}
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -321,7 +361,6 @@ private fun AddSavingDialog(
             )
         }
     }
-
 }
 
 @Preview

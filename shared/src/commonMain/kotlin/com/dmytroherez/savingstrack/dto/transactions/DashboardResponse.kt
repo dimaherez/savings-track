@@ -4,17 +4,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DashboardResponse(
-    val categories: Map<SavingCategory, CategorySummary>
-)
-
-@Serializable
-data class CategorySummary(
-    val currencyTotals: List<CurrencyTotal>,
-    val recentTransactions: List<TransactionItem>
+    val categories: Map<SavingCategory, List<CurrencyTotal>>
 )
 
 @Serializable
 data class CurrencyTotal(
     val currency: String,
-    val totalAmount: Double
+    val totalAmount: Double,
+    val recentTransactions: List<TransactionItem>,
+    val hasMoreTransactions: Boolean
 )
