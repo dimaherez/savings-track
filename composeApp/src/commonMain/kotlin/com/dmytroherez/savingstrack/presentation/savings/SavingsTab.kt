@@ -21,13 +21,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -59,9 +60,7 @@ import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import com.dmytroherez.savingstrack.presentation.transactions.TransactionsScreen
 import kotlinx.coroutines.launch
 import multiplatform.network.cmptoast.showToast
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.ExperimentalTime
 
 object SavingsTab : Tab {
     override val options: TabOptions
@@ -102,7 +101,7 @@ object SavingsTab : Tab {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            TabRow(
+            SecondaryTabRow(
                 selectedTabIndex = pagerState.currentPage
             ) {
                 tabs.forEach { tabEntry ->
@@ -228,7 +227,7 @@ private fun SavingsScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+@OptIn(ExperimentalMaterial3Api::class)
 private fun LazyListScope.listItems(
     currencyTotals: List<CurrencyTotal>,
     onViewAllClick: (currency: String) -> Unit
@@ -243,7 +242,7 @@ private fun LazyListScope.listItems(
                 ) {
                     Row(
                         modifier = Modifier
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -329,7 +328,7 @@ private fun AddSavingDialog(
                     readOnly = true,
                     label = { Text("Currency") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded) },
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
                 )
                 ExposedDropdownMenu(
                     expanded = dropdownExpanded,

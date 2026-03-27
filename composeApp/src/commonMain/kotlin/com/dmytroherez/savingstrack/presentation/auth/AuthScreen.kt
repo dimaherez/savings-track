@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -35,7 +36,6 @@ import com.dmytroherez.savingstrack.MainScreen
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.presentation.components.inputs.TextInput
 import multiplatform.network.cmptoast.showToast
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.viewmodel.koinViewModel
 
 data object AuthScreen : Screen {

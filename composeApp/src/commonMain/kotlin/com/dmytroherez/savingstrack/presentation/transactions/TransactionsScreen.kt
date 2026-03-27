@@ -25,7 +25,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
 import multiplatform.network.cmptoast.showToast
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.ExperimentalTime
 
 data class TransactionsScreen(private val currency: String) : Screen {
     @Composable
@@ -57,7 +56,6 @@ data class TransactionsScreen(private val currency: String) : Screen {
     }
 }
 
-@OptIn(ExperimentalTime::class)
 @Composable
 fun TransactionsScreenContent(
     state: TransactionsState,

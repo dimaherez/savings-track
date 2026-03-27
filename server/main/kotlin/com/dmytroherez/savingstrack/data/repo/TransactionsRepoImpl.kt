@@ -9,9 +9,9 @@ import com.dmytroherez.savingstrack.data.tables.TransactionsTable.description
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
 import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
 import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
-import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
+import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -22,7 +22,6 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
-import kotlin.time.ExperimentalTime
 
 class TransactionsRepoImpl : TransactionsRepo {
     private suspend fun <T> dbQuery(block: suspend () -> T): T = withContext(Dispatchers.IO) {
@@ -41,7 +40,6 @@ class TransactionsRepoImpl : TransactionsRepo {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun getAllTransactions(
         userId: String,
         currency: String
@@ -65,7 +63,6 @@ class TransactionsRepoImpl : TransactionsRepo {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun getTransactionsDashboard(userId: String): DashboardResponse {
         return dbQuery {
             val totalAmount = amount.sum()
