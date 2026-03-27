@@ -3,9 +3,10 @@ package com.dmytroherez.savingstrack.presentation.savings
 import androidx.lifecycle.viewModelScope
 import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.UiText
+import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
-import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
@@ -14,13 +15,14 @@ import savingstrack.composeapp.generated.resources.success
 
 class SavingsViewModel(
     private val getSavingsUC: GetSavingsUC,
-    private val postSavingUC: PostSavingUC
+    private val postSavingUC: PostSavingUC,
+    private val getSavingsDashboardUC: GetSavingsDashboardUC
 ) : BaseViewModel<SavingsState, SavingsEvent>(
     SavingsState()
 ) {
 
     init {
-        getSavings()
+        getSavingsDashboard()
     }
 
     fun onAction(action: SavingsAction) {
@@ -31,14 +33,14 @@ class SavingsViewModel(
         }
     }
 
-    private fun getSavings() {
+    private fun getSavingsDashboard() {
         viewModelScope.launch(Dispatchers.IO) {
             updateState { it.copy(isSavingsListLoading = true) }
-            getSavingsUC()
-                .onSuccess { resultList ->
+            getSavingsDashboardUC()
+                .onSuccess { response ->
                     updateState {
                         it.copy(
-                            savings = resultList,
+                            savings = response,
                             isSavingsListLoading = false
                         )
                     }
@@ -50,6 +52,25 @@ class SavingsViewModel(
         }
     }
 
+//    private fun getSavings() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            updateState { it.copy(isSavingsListLoading = true) }
+//            getSavingsUC()
+//                .onSuccess { resultList ->
+//                    updateState {
+//                        it.copy(
+//                            savings = resultList,
+//                            isSavingsListLoading = false
+//                        )
+//                    }
+//                }
+//                .onFailure { err ->
+//                    sendEvent(SavingsEvent.ShowToast(UiText.DynamicString(err.message)))
+//                    updateState { it.copy(isSavingsListLoading = false) }
+//                }
+//        }
+//    }
+
     private fun postSaving(request: PostTransactionRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             updateState { it.copy(isAddSavingLoading = true) }
@@ -58,6 +79,7 @@ class SavingsViewModel(
                     sendEvent(
                         SavingsEvent.ShowToast(UiText.StringResourceId(Res.string.success))
                     )
+                    getSavingsDashboard()
                     onAddSavingComplete()
                 }
                 .onFailure { err ->

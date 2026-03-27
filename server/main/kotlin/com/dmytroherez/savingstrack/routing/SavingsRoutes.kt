@@ -2,7 +2,7 @@ package com.dmytroherez.savingstrack.routing
 
 import com.dmytroherez.savingstrack.Constants.JWT_NAME
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
-import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_DASHBOARD
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_LIST_TRANSACTIONS
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_POST_TRANSACTION
@@ -42,7 +42,10 @@ fun Routing.transactionsRoutes() {
 
             get(PATH_TRANSACTIONS_DASHBOARD) {
                 withSecureUid { uid ->
-
+                    call.respond(
+                        status = HttpStatusCode.OK,
+                        message = repository.getTransactionsDashboard(uid)
+                    )
                 }
             }
         }

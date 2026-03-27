@@ -2,8 +2,10 @@ package com.dmytroherez.savingstrack.data.repoimpl
 
 import co.touchlab.kermit.Logger
 import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
-import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
-import com.dmytroherez.savingstrack.dto.savings.TransactionItem
+import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
+import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_DASHBOARD
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_LIST_TRANSACTIONS
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_POST_TRANSACTION
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_PREFIX
@@ -36,6 +38,16 @@ class SavingsRepoImpl(
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "SavingsRepoImpl.getSavings()" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getSavingsDashboard(): Result<DashboardResponse> {
+        return try {
+            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_DASHBOARD")
+            Result.success(response.body())
+        } catch (e: Exception) {
+            Logger.e(e) { "SavingsRepoImpl.getSavingsDashboard()" }
             Result.failure(e)
         }
     }

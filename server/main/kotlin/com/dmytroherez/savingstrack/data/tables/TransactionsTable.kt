@@ -8,7 +8,7 @@ import com.dmytroherez.savingstrack.Constants.FIELD_CURRENCY
 import com.dmytroherez.savingstrack.Constants.FIELD_DESCRIPTION
 import com.dmytroherez.savingstrack.Constants.FIELD_CREATED_AT
 import com.dmytroherez.savingstrack.Constants.TABLE_TRANSACTIONS
-import com.dmytroherez.savingstrack.dto.savings.SavingCategory
+import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.datetime.CurrentTimestamp
 import org.jetbrains.exposed.v1.datetime.timestamp

@@ -14,6 +14,7 @@ import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
 import com.dmytroherez.savingstrack.domain.usecase.auth.GetCurrentUserUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.LoginUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.RegisterUC
+import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
 import dev.gitlive.firebase.Firebase
@@ -44,6 +45,7 @@ val domainModule = module {
     singleOf(::GetCurrentUserUC)
     singleOf(::GetSavingsUC)
     singleOf(::PostSavingUC)
+    singleOf(::GetSavingsDashboardUC)
 }
 
 val presentationModule = module {
@@ -59,7 +61,8 @@ val presentationModule = module {
 
     viewModel { SavingsViewModel(
         getSavingsUC = get(),
-        postSavingUC = get()
+        postSavingUC = get(),
+        getSavingsDashboardUC = get()
     ) }
 
     viewModelOf(::HomeViewModel)

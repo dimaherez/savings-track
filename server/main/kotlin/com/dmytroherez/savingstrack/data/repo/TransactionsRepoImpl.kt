@@ -7,12 +7,19 @@ import com.dmytroherez.savingstrack.data.tables.TransactionsTable.createdAt
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.currency
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.description
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
-import com.dmytroherez.savingstrack.dto.savings.TransactionItem
-import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.transactions.CategorySummary
+import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
+import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
+import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
+import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 import kotlin.time.ExperimentalTime
@@ -51,6 +58,62 @@ class TransactionsRepoImpl : TransactionsRepo {
                         category = it[category]
                     )
                 }
+        }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    override suspend fun getTransactionsDashboard(userId: String): DashboardResponse {
+        return dbQuery {
+            val totalAmount = amount.sum()
+
+            val aggregatedTotals = TransactionsTable
+                .select(category, currency, totalAmount)
+                .where { TransactionsTable.userId eq userId }
+                .groupBy(category, currency)
+                .map { row ->
+                    val category = row[category]
+                    val currency = row[currency]
+                    val sum = row[totalAmount] ?: 0.0
+                    Triple(category, currency, sum)
+                }
+
+            val recentTransactions = TransactionsTable
+                .selectAll()
+                .where {TransactionsTable.userId eq userId}
+                .orderBy(createdAt to SortOrder.DESC)
+                .limit(20)
+                .map { row ->
+                    TransactionItem(
+                        id = row[TransactionsTable.id],
+                        userId = row[TransactionsTable.userId],
+                        category = row[category],
+                        currency = row[currency],
+                        amount = row[amount],
+                        description = row[description],
+                        createdAt = row[createdAt]
+                    )
+                }
+
+            val categoriesMap = mutableMapOf<SavingCategory, CategorySummary>()
+
+            val activeCategories = aggregatedTotals.map { it.first }.toSet()
+
+            for (category in activeCategories) {
+                val currencyTotalsForCategory = aggregatedTotals
+                    .filter { it.first == category }
+                    .map { CurrencyTotal(it.second, it.third) }
+
+                val recentForCategory = recentTransactions
+                    .filter { it.category == category }
+                    .take(3)
+
+                categoriesMap[category] = CategorySummary(
+                    currencyTotals = currencyTotalsForCategory,
+                    recentTransactions = recentForCategory
+                )
+            }
+
+            DashboardResponse(categories = categoriesMap)
         }
     }
 }

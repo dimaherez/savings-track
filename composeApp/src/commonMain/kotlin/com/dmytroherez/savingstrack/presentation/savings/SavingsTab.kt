@@ -52,9 +52,9 @@ import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
-import com.dmytroherez.savingstrack.domain.enums.SavingsPagerTab
-import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
-import com.dmytroherez.savingstrack.dto.savings.SavingCategory
+import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
+import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import kotlinx.coroutines.launch
 import multiplatform.network.cmptoast.showToast
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -79,7 +79,9 @@ object SavingsTab : Tab {
         val viewModel = koinViewModel<SavingsViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
 
-        val pagerState = rememberPagerState { SavingsPagerTab.entries.size }
+        val tabs = SavingCategory.entries.take(2)
+
+        val pagerState = rememberPagerState { tabs.size }
 
         LaunchedEffect(lifecycleOwner.lifecycle) {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -99,7 +101,7 @@ object SavingsTab : Tab {
             TabRow(
                 selectedTabIndex = pagerState.currentPage
             ) {
-                SavingsPagerTab.entries.forEach { tabEntry ->
+                tabs.forEach { tabEntry ->
                     Tab(
                         selected = pagerState.currentPage == tabEntry.ordinal,
                         onClick = {
@@ -107,7 +109,7 @@ object SavingsTab : Tab {
                                 pagerState.animateScrollToPage(tabEntry.ordinal)
                             }
                         },
-                        text = { Text(text = tabEntry.title.asString()) }
+                        text = { Text(text = tabEntry.name) }
                     )
                 }
             }
@@ -174,7 +176,9 @@ private fun FiatScreenContent(
                     .clip(RoundedCornerShape(24.dp))
                     .weight(1f)
             ) {
-                listItems(state, pagerState)
+                listItems(
+                    currencyTotals = state.savings?.categories[SavingCategory.entries[pagerState.currentPage]]?.currencyTotals ?: emptyList()
+                )
             }
         }
 
@@ -213,16 +217,9 @@ private fun FiatScreenContent(
 }
 
 private fun LazyListScope.listItems(
-    state: SavingsState,
-    pagerState: PagerState
+    currencyTotals: List<CurrencyTotal>
 ) {
-    state.savings
-        .filter { item ->
-            when (SavingsPagerTab.entries[pagerState.currentPage]) {
-                SavingsPagerTab.FIAT -> item.category == SavingCategory.FIAT
-                SavingsPagerTab.CRYPTO -> item.category == SavingCategory.CRYPTO
-            }
-        }
+    currencyTotals
         .forEach { savingItem ->
             item {
                 Row(
@@ -232,7 +229,7 @@ private fun LazyListScope.listItems(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(savingItem.currency)
-                    Text(formatAsFiat(savingItem.amount, savingItem.currency))
+                    Text(formatAsFiat(savingItem.totalAmount, savingItem.currency))
                 }
             }
         }

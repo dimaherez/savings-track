@@ -1,4 +1,4 @@
-package com.dmytroherez.savingstrack.dto.savings
+package com.dmytroherez.savingstrack.dto.transactions
 
 import kotlinx.serialization.Serializable
 

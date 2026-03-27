@@ -1,11 +1,13 @@
 package com.dmytroherez.savingstrack.domain.repo
 
-import com.dmytroherez.savingstrack.dto.savings.PostTransactionRequest
-import com.dmytroherez.savingstrack.dto.savings.TransactionItem
+import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
+import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
+import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 
 interface SavingsRepo {
     suspend fun postSaving(
         request: PostTransactionRequest
     ): Result<Unit>
     suspend fun getSavings(): Result<List<TransactionItem>>
+    suspend fun getSavingsDashboard() : Result<DashboardResponse>
 }
