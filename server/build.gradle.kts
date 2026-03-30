@@ -23,6 +23,7 @@ sourceSets {
 }
 
 dependencies {
+    implementation(project(":shared"))
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.logback.classic)
@@ -31,6 +32,7 @@ dependencies {
     testImplementation(libs.kotlin.testJunit)
 
     implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.kotlinx.datetime)
 
     // Koin
     implementation(project.dependencies.platform(libs.koin.bom))
@@ -53,6 +55,4 @@ dependencies {
     implementation(libs.ktor.server.auth.jvm)
     implementation(libs.ktor.server.auth.jwt.jvm)
     implementation(libs.jwks.rsa)
-
-    implementation(project(":shared"))
 }

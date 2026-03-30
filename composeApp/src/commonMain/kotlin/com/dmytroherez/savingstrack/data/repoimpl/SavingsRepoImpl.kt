@@ -4,11 +4,10 @@ import co.touchlab.kermit.Logger
 import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
 import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
-import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 import com.dmytroherez.savingstrack.dto.transactions.TransactionsByCurrencyResponse
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_DASHBOARD
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_LIST_TRANSACTIONS
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_POST_TRANSACTION
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_LIST
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_ADD
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_PREFIX
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -23,7 +22,7 @@ class SavingsRepoImpl(
         request: PostTransactionRequest
     ): Result<Unit> {
         return try {
-            httpClient.post("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_POST_TRANSACTION") {
+            httpClient.post("$PATH_TRANSACTIONS_PREFIX$PATH_SUFFIX_ADD") {
                 setBody(request)
             }
             Result.success(Unit)
@@ -35,7 +34,7 @@ class SavingsRepoImpl(
 
     override suspend fun getTransactionsByCurrency(currency: String): Result<TransactionsByCurrencyResponse> {
         return try {
-            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_LIST_TRANSACTIONS/$currency")
+            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_SUFFIX_LIST/$currency")
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "SavingsRepoImpl.getSavings()" }

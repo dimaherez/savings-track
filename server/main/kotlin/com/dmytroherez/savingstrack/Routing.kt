@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack
 
+import com.dmytroherez.savingstrack.routing.goalsRoutes
 import com.dmytroherez.savingstrack.routing.transactionsRoutes
 import io.ktor.server.application.Application
 import io.ktor.server.response.respondText
@@ -13,5 +14,6 @@ fun Application.configureRouting() {
         }
 
         transactionsRoutes()
+        goalsRoutes()
     }
 }

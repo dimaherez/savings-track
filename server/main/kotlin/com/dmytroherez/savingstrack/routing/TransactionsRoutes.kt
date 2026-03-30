@@ -5,8 +5,8 @@ import com.dmytroherez.savingstrack.Constants.JWT_NAME
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_DASHBOARD
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_LIST_TRANSACTIONS
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_POST_TRANSACTION
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_LIST
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_ADD
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_PREFIX
 import com.dmytroherez.savingstrack.withSecureUid
 import io.ktor.http.HttpStatusCode
@@ -25,14 +25,14 @@ fun Routing.transactionsRoutes() {
     authenticate(JWT_NAME) {
         route(PATH_TRANSACTIONS_PREFIX) {
 
-            post(PATH_TRANSACTIONS_POST_TRANSACTION) {
+            post(PATH_SUFFIX_ADD) {
                 withSecureUid { uid ->
                     repository.addTransaction(uid, call.receive<PostTransactionRequest>())
                     call.respond(HttpStatusCode.Created)
                 }
             }
 
-            get("$PATH_TRANSACTIONS_LIST_TRANSACTIONS/{$FIELD_CURRENCY}") {
+            get("$PATH_SUFFIX_LIST/{$FIELD_CURRENCY}") {
                 withSecureUid { uid ->
                     call.pathParameters[FIELD_CURRENCY]?.let { currency ->
                         call.respond(

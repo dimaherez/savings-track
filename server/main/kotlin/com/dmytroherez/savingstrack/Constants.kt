@@ -9,15 +9,28 @@ object Constants {
 
     // Tables
     const val TABLE_TRANSACTIONS = "Transactions"
+    const val TABLE_GOALS = "Goals"
 
     // Table fields
+
+    //id
     const val FIELD_ID = "id"
-    const val FIELD_USER_ID = "userId"
-    const val FIELD_CURRENCY = "currency"
+    const val FIELD_GOAL_ID = "goalId"
+    const val FIELD_FIREBASE_UID = "firebaseUid"
+
+    // amount
     const val FIELD_AMOUNT = "amount"
-    const val FIELD_DESCRIPTION = "description"
-    const val FIELD_CATEGORY = "category"
+    const val FIELD_TARGET_AMOUNT = "amount"
+
+    // dates
     const val FIELD_CREATED_AT = "createdAt"
+    const val FIELD_DEADLINE = "deadline"
 
+    // title and description
+    const val FIELD_TITLE = "title"
+    const val FIELD_DESCRIPTION = "description"
 
+    // currency
+    const val FIELD_CURRENCY = "currency"
+    const val FIELD_CATEGORY = "category"
 }

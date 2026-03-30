@@ -8,12 +8,16 @@ import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
 import com.dmytroherez.savingstrack.core.network.createHttpClient
 import com.dmytroherez.savingstrack.data.repoimpl.AuthRepoImpl
+import com.dmytroherez.savingstrack.data.repoimpl.GoalsRepoImpl
 import com.dmytroherez.savingstrack.data.repoimpl.SavingsRepoImpl
 import com.dmytroherez.savingstrack.domain.repo.AuthRepo
+import com.dmytroherez.savingstrack.domain.repo.GoalsRepo
 import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
 import com.dmytroherez.savingstrack.domain.usecase.auth.GetCurrentUserUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.LoginUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.RegisterUC
+import com.dmytroherez.savingstrack.domain.usecase.goals.AddGoalUC
+import com.dmytroherez.savingstrack.domain.usecase.goals.GetGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
@@ -38,6 +42,7 @@ val dataModule = module {
 
     single<AuthRepo> { AuthRepoImpl(firebaseAuth = Firebase.auth) }
     single<SavingsRepo> { SavingsRepoImpl(httpClient = get()) }
+    single<GoalsRepo> { GoalsRepoImpl(httpClient = get()) }
 }
 
 val domainModule = module {
@@ -47,6 +52,8 @@ val domainModule = module {
     singleOf(::GetTransactionsByCurrencyUC)
     singleOf(::PostSavingUC)
     singleOf(::GetSavingsDashboardUC)
+    singleOf(::AddGoalUC)
+    singleOf(::GetGoalsUC)
 }
 
 val presentationModule = module {
@@ -70,7 +77,11 @@ val presentationModule = module {
         getTransactionsByCurrencyUC = get()
     ) }
 
-    viewModelOf(::HomeViewModel)
+    viewModel { HomeViewModel(
+        addGoalUC = get(),
+        getGoalsUC = get()
+    ) }
+
     viewModelOf(::IncomeViewModel)
 }
 

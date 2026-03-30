@@ -6,6 +6,7 @@ import com.dmytroherez.savingstrack.data.tables.TransactionsTable.category
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.createdAt
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.currency
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.description
+import com.dmytroherez.savingstrack.dbQuery
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
 import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
 import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
@@ -13,8 +14,6 @@ import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 import com.dmytroherez.savingstrack.dto.transactions.TransactionsByCurrencyResponse
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
@@ -22,20 +21,15 @@ import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
-import org.jetbrains.exposed.v1.jdbc.transactions.suspendTransaction
 
 class TransactionsRepoImpl : TransactionsRepo {
-    private suspend fun <T> dbQuery(block: suspend () -> T): T = withContext(Dispatchers.IO) {
-        suspendTransaction { block() }
-    }
-
     override suspend fun addTransaction(uid: String, transaction: PostTransactionRequest) {
         dbQuery {
             TransactionsTable.insert {
                 it[currency] = transaction.currency
                 it[amount] = transaction.amount
                 it[description] = transaction.description
-                it[userId] = uid
+                it[firebaseUid] = uid
                 it[category] = transaction.category
             }[TransactionsTable.id]
         }
@@ -48,7 +42,7 @@ class TransactionsRepoImpl : TransactionsRepo {
         return dbQuery {
             val transactionsRaw = TransactionsTable
                 .selectAll()
-                .where { (TransactionsTable.userId eq userId) and (TransactionsTable.currency eq currency)}
+                .where { (TransactionsTable.firebaseUid eq userId) and (TransactionsTable.currency eq currency)}
                 .orderBy(createdAt, SortOrder.DESC)
 
             TransactionsByCurrencyResponse (
@@ -58,7 +52,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                         id = it[TransactionsTable.id],
                         currency = it[TransactionsTable.currency],
                         amount = it[amount],
-                        userId = it[TransactionsTable.userId],
+                        userId = it[TransactionsTable.firebaseUid],
                         description = it[description],
                         createdAt = it[createdAt],
                         category = it[category]
@@ -74,7 +68,7 @@ class TransactionsRepoImpl : TransactionsRepo {
 
             val aggregatedTotals = TransactionsTable
                 .select(category, currency, totalAmount)
-                .where { TransactionsTable.userId eq userId }
+                .where { TransactionsTable.firebaseUid eq userId }
                 .groupBy(category, currency)
                 .map { row ->
                     val category = row[category]
@@ -85,12 +79,12 @@ class TransactionsRepoImpl : TransactionsRepo {
 
             val transactions = TransactionsTable
                 .selectAll()
-                .where {TransactionsTable.userId eq userId}
+                .where {TransactionsTable.firebaseUid eq userId}
                 .orderBy(createdAt to SortOrder.DESC)
                 .map { row ->
                     TransactionItem(
                         id = row[TransactionsTable.id],
-                        userId = row[TransactionsTable.userId],
+                        userId = row[TransactionsTable.firebaseUid],
                         category = row[category],
                         currency = row[currency],
                         amount = row[amount],
