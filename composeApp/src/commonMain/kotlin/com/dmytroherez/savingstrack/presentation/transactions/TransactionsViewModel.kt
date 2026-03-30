@@ -3,13 +3,13 @@ package com.dmytroherez.savingstrack.presentation.transactions
 import androidx.lifecycle.viewModelScope
 import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.UiText
-import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsUC
+import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 
 class TransactionsViewModel(
-    private val getTransactionsUC: GetTransactionsUC
+    private val getTransactionsByCurrencyUC: GetTransactionsByCurrencyUC
 ) : BaseViewModel<TransactionsState, TransactionsEvent>(
     TransactionsState()
 ) {
@@ -22,13 +22,17 @@ class TransactionsViewModel(
 
     fun getTransactions(currency: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            updateState { it.copy(isLoading = true) }
-            getTransactionsUC(currency)
+            updateState { it.copy(
+                isLoading = true,
+                currency = currency
+            ) }
+            getTransactionsByCurrencyUC(currency)
                 .onSuccess { result ->
                     updateState {
                         it.copy(
                             isLoading = true,
-                            transactions = result
+                            transactions = result.transactions,
+                            totalAmount = result.totalAmount
                         )
                     }
                 }

@@ -5,6 +5,7 @@ import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
 import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.dto.transactions.TransactionsByCurrencyResponse
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_DASHBOARD
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_LIST_TRANSACTIONS
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_POST_TRANSACTION
@@ -32,7 +33,7 @@ class SavingsRepoImpl(
         }
     }
 
-    override suspend fun getSavings(currency: String): Result<List<TransactionItem>> {
+    override suspend fun getTransactionsByCurrency(currency: String): Result<TransactionsByCurrencyResponse> {
         return try {
             val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_LIST_TRANSACTIONS/$currency")
             Result.success(response.body())

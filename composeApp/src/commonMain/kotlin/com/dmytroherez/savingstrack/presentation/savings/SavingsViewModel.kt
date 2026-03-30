@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.UiText
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
-import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsUC
+import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +14,7 @@ import savingstrack.composeapp.generated.resources.Res
 import savingstrack.composeapp.generated.resources.success
 
 class SavingsViewModel(
-    private val getTransactionsUC: GetTransactionsUC,
+    private val getTransactionsByCurrencyUC: GetTransactionsByCurrencyUC,
     private val postSavingUC: PostSavingUC,
     private val getSavingsDashboardUC: GetSavingsDashboardUC
 ) : BaseViewModel<SavingsState, SavingsEvent>(

@@ -12,6 +12,7 @@ import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.dto.transactions.TransactionsByCurrencyResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -43,13 +44,16 @@ class TransactionsRepoImpl : TransactionsRepo {
     override suspend fun getAllTransactions(
         userId: String,
         currency: String
-    ): List<TransactionItem> {
+    ): TransactionsByCurrencyResponse {
         return dbQuery {
-            TransactionsTable
+            val transactionsRaw = TransactionsTable
                 .selectAll()
                 .where { (TransactionsTable.userId eq userId) and (TransactionsTable.currency eq currency)}
                 .orderBy(createdAt, SortOrder.DESC)
-                .map {
+
+            TransactionsByCurrencyResponse (
+                totalAmount = transactionsRaw.map { it[amount] }.reduce { amount1, amount2 -> amount1 + amount2},
+                transactions = transactionsRaw.map {
                     TransactionItem(
                         id = it[TransactionsTable.id],
                         currency = it[TransactionsTable.currency],
@@ -60,6 +64,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                         category = it[category]
                     )
                 }
+            )
         }
     }
 
