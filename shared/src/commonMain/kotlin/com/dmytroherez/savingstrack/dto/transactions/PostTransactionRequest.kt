@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class PostTransactionRequest(
     val currency: String,
     val amount: Double,
+    val category: SavingCategory,
     val description: String? = null,
-    val category: SavingCategory
+    val goalId: Int? = null
 )

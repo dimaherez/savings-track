@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack.data.repo
 
+import com.dmytroherez.savingstrack.data.tables.GoalsTable
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.amount
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.category
@@ -8,6 +9,7 @@ import com.dmytroherez.savingstrack.data.tables.TransactionsTable.currency
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.description
 import com.dmytroherez.savingstrack.dbQuery
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
+import com.dmytroherez.savingstrack.dto.goals.GoalForTransactionItem
 import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
 import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
@@ -31,6 +33,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                 it[description] = transaction.description
                 it[firebaseUid] = uid
                 it[category] = transaction.category
+                it[goalId] = transaction.goalId
             }[TransactionsTable.id]
         }
     }
@@ -93,6 +96,20 @@ class TransactionsRepoImpl : TransactionsRepo {
                     )
                 }
 
+            val goals = GoalsTable
+                .select(
+                    GoalsTable.id,
+                    GoalsTable.title
+                )
+                .where { GoalsTable.firebaseUid eq userId }
+                .orderBy(GoalsTable.createdAt to SortOrder.DESC)
+                .map {
+                    GoalForTransactionItem(
+                        id = it[GoalsTable.id],
+                        title = it[GoalsTable.title]
+                    )
+                }
+
             val categoriesMap = mutableMapOf<SavingCategory, List<CurrencyTotal>>()
 
             val activeCategories = aggregatedTotals.map { it.first }.toSet()
@@ -113,7 +130,10 @@ class TransactionsRepoImpl : TransactionsRepo {
                 categoriesMap[category] = currencyTotalsForCategory
             }
 
-            DashboardResponse(categories = categoriesMap)
+            DashboardResponse(
+                categories = categoriesMap,
+                availableGoals = goals
+            )
         }
     }
 }

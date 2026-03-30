@@ -1,7 +1,18 @@
 package com.dmytroherez.savingstrack.presentation.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
@@ -10,8 +21,26 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,14 +49,14 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.dmytroherez.savingstrack.core.presentation.components.AppDropdown
+import com.dmytroherez.savingstrack.core.presentation.components.AppFormDialog
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
 import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
 import com.dmytroherez.savingstrack.dto.goals.GoalItem
-import com.dmytroherez.savingstrack.presentation.savings.SavingsAction
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.viewmodel.koinViewModel
@@ -256,7 +285,7 @@ fun GoalProgressBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateGoalDialog(
-    availableCurrencies: List<String> = listOf("USD", "EUR", "UAH"), // Standard defaults
+    availableCurrencies: List<String> = listOf("USD", "EUR", "UAH"),
     onDismiss: () -> Unit,
     onSave: (CreateGoalRequest) -> Unit
 ) {
@@ -264,157 +293,71 @@ fun CreateGoalDialog(
     var amount by remember { mutableStateOf("") }
     var selectedCurrency by remember { mutableStateOf(availableCurrencies.first()) }
 
-    // Date Picker State
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
 
-    // Dropdown State
-    var expandedCurrency by remember { mutableStateOf(false) }
-
     val selectedDateString = datePickerState.selectedDateMillis?.let { millis ->
         Instant.fromEpochMilliseconds(millis)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .date
-            .toString() // Returns ISO-8601 format like "2026-12-31"
+            .toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
     } ?: ""
 
-    // The Date Picker Overlay
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
-                }
-            }
+            confirmButton = { TextButton(onClick = { showDatePicker = false }) { Text("Confirm") } },
+            dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } }
         ) {
             DatePicker(state = datePickerState)
         }
     }
 
-
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            shape = MaterialTheme.shapes.large
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Create New Goal",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-
-                // Title Input
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Goal Title") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Target Amount Input
-                OutlinedTextField(
-                    value = amount,
-                    onValueChange = { amount = it },
-                    label = { Text("Target Amount") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Currency Dropdown
-                ExposedDropdownMenuBox(
-                    expanded = expandedCurrency,
-                    onExpandedChange = { expandedCurrency = !expandedCurrency }
-                ) {
-                    OutlinedTextField(
-                        value = selectedCurrency,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Currency") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedCurrency) },
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expandedCurrency,
-                        onDismissRequest = { expandedCurrency = false }
-                    ) {
-                        availableCurrencies.forEach { currency ->
-                            DropdownMenuItem(
-                                text = { Text(currency) },
-                                onClick = {
-                                    selectedCurrency = currency
-                                    expandedCurrency = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                // Deadline Input (Triggers Date Picker)
-                OutlinedTextField(
-                    value = selectedDateString,
-                    onValueChange = {},
-                    readOnly = true, // Prevent manual typing
-                    label = { Text("Deadline (Optional)") },
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.DateRange, contentDescription = "Select Date")
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Action Buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Cancel")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        enabled = title.isNotBlank() && amount.toDoubleOrNull() != null,
-                        onClick = {
-                            val targetAmount = amount.toDouble()
-                            val deadlineDate = datePickerState.selectedDateMillis?.let { millis ->
-                                Instant.fromEpochMilliseconds(millis)
-                                    .toLocalDateTime(TimeZone.currentSystemDefault())
-                                    .date
-                            }
-
-                            onSave(
-                                CreateGoalRequest(
-                                    title = title,
-                                    targetAmount = targetAmount,
-                                    currency = selectedCurrency,
-                                    deadline = deadlineDate
-                                )
-                            )
-                        }
-                    ) {
-                        Text("Save Goal")
-                    }
-                }
+    AppFormDialog(
+        title = "Create New Goal",
+        isSaveEnabled = title.isNotBlank() && amount.toDoubleOrNull() != null,
+        onDismiss = onDismiss,
+        onSave = {
+            val deadlineDate = datePickerState.selectedDateMillis?.let { millis ->
+                Instant.fromEpochMilliseconds(millis)
+                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
             }
+            onSave(CreateGoalRequest(title, amount.toDouble(), selectedCurrency, deadlineDate))
         }
+    ) {
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text("Goal Title") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = amount,
+            onValueChange = { amount = it },
+            label = { Text("Target Amount") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        AppDropdown(
+            label = "Currency",
+            options = availableCurrencies,
+            selectedOption = selectedCurrency,
+            onOptionSelected = { selectedCurrency = it }
+        )
+
+        OutlinedTextField(
+            value = selectedDateString,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Deadline (Optional)") },
+            trailingIcon = {
+                IconButton(onClick = { showDatePicker = true }) {
+                    Icon(Icons.Default.DateRange, contentDescription = "Select Date")
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

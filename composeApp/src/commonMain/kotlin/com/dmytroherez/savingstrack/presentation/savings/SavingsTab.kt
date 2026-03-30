@@ -1,15 +1,17 @@
 package com.dmytroherez.savingstrack.presentation.savings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.pager.HorizontalPager
@@ -17,6 +19,8 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -41,9 +45,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,9 +57,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.LocalRootNavigator
+import com.dmytroherez.savingstrack.core.presentation.components.AppDropdown
+import com.dmytroherez.savingstrack.core.presentation.components.AppFormDialog
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
-import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonPrimary
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
+import com.dmytroherez.savingstrack.dto.goals.GoalForTransactionItem
 import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
@@ -199,11 +207,13 @@ private fun SavingsScreenContent(
             )
         }
 
-        AddSavingDialog(
-            isVisible = state.showAddSavingDialog,
-            onAddClick = { request -> onAction(SavingsAction.PostSaving(request)) },
-            onDismissRequest = { onAction(SavingsAction.ToggleAddSavingDialog) }
-        )
+        if (state.showAddSavingDialog) {
+            AddTransactionDialog(
+                onDismiss = { onAction(SavingsAction.ToggleAddSavingDialog) },
+                availableGoals = state.savings?.availableGoals ?: emptyList(),
+                onSave = { request -> onAction(SavingsAction.PostSaving(request)) }
+            )
+        }
 
         TextButton(
             modifier = Modifier
@@ -291,94 +301,75 @@ private fun LazyListScope.listItems(
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddSavingDialog(
-    isVisible: Boolean,
-    onAddClick: (PostTransactionRequest) -> Unit,
-    onDismissRequest: () -> Unit
+fun AddTransactionDialog(
+    availableCurrencies: List<String> = listOf("USD", "EUR", "UAH", "BTC"),
+    availableGoals: List<GoalForTransactionItem>,
+    onDismiss: () -> Unit,
+    onSave: (PostTransactionRequest) -> Unit
 ) {
-    if (isVisible.not()) return
-
     var amount by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
-    var selectedCurrency by remember { mutableStateOf("") }
-    var dropdownExpanded by remember { mutableStateOf(false) }
+    var selectedCurrency by remember { mutableStateOf(availableCurrencies.first()) }
+    var selectedCategory by remember { mutableStateOf(SavingCategory.entries.first()) }
+    var selectedGoal by remember { mutableStateOf<GoalForTransactionItem?>(null) }
 
-    val availableCurrencies = listOf("USD", "EUR", "GBP", "UAH", "JPY")
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .clickable(
-                onClick = onDismissRequest
-            )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-                .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            ExposedDropdownMenuBox(
-                expanded = dropdownExpanded,
-                onExpandedChange = { dropdownExpanded = !dropdownExpanded }
-            ) {
-                OutlinedTextField(
-                    value = selectedCurrency,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Currency") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdownExpanded) },
-                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+    AppFormDialog(
+        title = "Add Transaction",
+        isSaveEnabled = amount.toDoubleOrNull()?.let { it > 0 } == true,
+        onDismiss = onDismiss,
+        onSave = {
+            onSave(
+                PostTransactionRequest(
+                    category = selectedCategory,
+                    currency = selectedCurrency,
+                    amount = amount.toDouble(),
+                    description = description.trim().takeIf { it.isNotEmpty() },
+                    goalId = selectedGoal?.id
                 )
-                ExposedDropdownMenu(
-                    expanded = dropdownExpanded,
-                    onDismissRequest = { dropdownExpanded = false }
-                ) {
-                    availableCurrencies.forEach { currency ->
-                        DropdownMenuItem(
-                            text = { Text(currency) },
-                            onClick = {
-                                selectedCurrency = currency
-                                dropdownExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
-
-            // Amount Input
-            OutlinedTextField(
-                value = amount,
-                onValueChange = { amount = it },
-                label = { Text("Amount") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Description Input (Optional)
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description (Optional)") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            ButtonPrimary(
-                text = "Save",
-                onClick = {
-                    onAddClick(
-                        PostTransactionRequest(
-                            currency = selectedCurrency,
-                            amount = amount.toDoubleOrNull() ?: 0.0,
-                            description = description,
-                            category = SavingCategory.FIAT
-                        )
-                    )
-                }
             )
         }
+    ) {
+        AppDropdown(
+            label = "Goal",
+            options = availableGoals,
+            selectedOption = selectedGoal,
+            onOptionSelected = { selectedGoal = it },
+            displayText = { it?.title ?: "null" }
+        )
+
+        AppDropdown(
+            label = "Category",
+            options = SavingCategory.entries,
+            selectedOption = selectedCategory,
+            onOptionSelected = { selectedCategory = it },
+            displayText = { it.name }
+        )
+
+        AppDropdown(
+            label = "Currency",
+            options = availableCurrencies,
+            selectedOption = selectedCurrency,
+            onOptionSelected = { selectedCurrency = it }
+        )
+
+        OutlinedTextField(
+            value = amount,
+            onValueChange = { amount = it },
+            label = { Text("Amount") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            label = { Text("Description (Optional)") },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
-
 @Preview
 @Composable
 private fun FiatScreenContentPreview() = PreviewWithTheme {
