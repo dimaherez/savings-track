@@ -17,6 +17,7 @@ import com.dmytroherez.savingstrack.domain.usecase.auth.GetCurrentUserUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.LoginUC
 import com.dmytroherez.savingstrack.domain.usecase.auth.RegisterUC
 import com.dmytroherez.savingstrack.domain.usecase.goals.AddGoalUC
+import com.dmytroherez.savingstrack.domain.usecase.goals.CompleteGoalUC
 import com.dmytroherez.savingstrack.domain.usecase.goals.GetGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
@@ -46,14 +47,20 @@ val dataModule = module {
 }
 
 val domainModule = module {
+    // Auth
     singleOf(::RegisterUC)
     singleOf(::LoginUC)
     singleOf(::GetCurrentUserUC)
+
+    // Transactions (savings)
     singleOf(::GetTransactionsByCurrencyUC)
     singleOf(::PostSavingUC)
     singleOf(::GetSavingsDashboardUC)
+
+    // Goals
     singleOf(::AddGoalUC)
     singleOf(::GetGoalsUC)
+    singleOf(::CompleteGoalUC)
 }
 
 val presentationModule = module {
@@ -79,7 +86,8 @@ val presentationModule = module {
 
     viewModel { HomeViewModel(
         addGoalUC = get(),
-        getGoalsUC = get()
+        getGoalsUC = get(),
+        completeGoalUC = get()
     ) }
 
     viewModelOf(::IncomeViewModel)

@@ -44,7 +44,7 @@ fun Routing.transactionsRoutes() {
                         )
                     } ?: call.respond(
                         status = HttpStatusCode.BadRequest,
-                        message = "Currency is not provided"
+                        message = "Currency in path parameters is invalid or missing"
                     )
                 }
             }

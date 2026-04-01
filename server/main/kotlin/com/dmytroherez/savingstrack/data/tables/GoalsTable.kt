@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack.data.tables
 
+import com.dmytroherez.savingstrack.Constants.FIELD_COMPLETED_AT
 import com.dmytroherez.savingstrack.Constants.FIELD_CREATED_AT
 import com.dmytroherez.savingstrack.Constants.FIELD_CURRENCY
 import com.dmytroherez.savingstrack.Constants.FIELD_DEADLINE
@@ -21,6 +22,7 @@ object GoalsTable : Table(TABLE_GOALS) {
     val currency = varchar(FIELD_CURRENCY, 3)
     val deadline = date(FIELD_DEADLINE).nullable()
     val createdAt = timestamp(FIELD_CREATED_AT).defaultExpression(CurrentTimestamp)
+    val completedAt = timestamp(FIELD_COMPLETED_AT).nullable()
 
     override val primaryKey = PrimaryKey(id)
 }

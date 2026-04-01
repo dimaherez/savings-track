@@ -8,12 +8,12 @@ import com.dmytroherez.savingstrack.data.tables.TransactionsTable.createdAt
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.currency
 import com.dmytroherez.savingstrack.data.tables.TransactionsTable.description
 import com.dmytroherez.savingstrack.dbQuery
+import com.dmytroherez.savingstrack.domain.model.TransactionsAggregatedTotal
 import com.dmytroherez.savingstrack.domain.repo.TransactionsRepo
 import com.dmytroherez.savingstrack.dto.goals.GoalForTransactionItem
 import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
 import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
-import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 import com.dmytroherez.savingstrack.dto.transactions.TransactionsByCurrencyResponse
 import org.jetbrains.exposed.v1.core.SortOrder
@@ -77,7 +77,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                     val category = row[category]
                     val currency = row[currency]
                     val sum = row[totalAmount] ?: 0.0
-                    Triple(category, currency, sum)
+                    TransactionsAggregatedTotal(category, currency, sum)
                 }
 
             val transactions = TransactionsTable
@@ -110,25 +110,21 @@ class TransactionsRepoImpl : TransactionsRepo {
                     )
                 }
 
-            val categoriesMap = mutableMapOf<SavingCategory, List<CurrencyTotal>>()
-
-            val activeCategories = aggregatedTotals.map { it.first }.toSet()
-
-            for (category in activeCategories) {
-                val currencyTotalsForCategory = aggregatedTotals
-                    .filter { it.first == category }
-                    .map {
-                        val recentTransactions = transactions.filter { item -> item.currency == it.second }
-                        CurrencyTotal(
-                            currency = it.second,
-                            totalAmount = it.third,
-                            recentTransactions = recentTransactions.take(3),
-                            hasMoreTransactions = recentTransactions.size > 3
-                        )
-                    }
-
-                categoriesMap[category] = currencyTotalsForCategory
-            }
+            val categoriesMap =
+                aggregatedTotals.map { it.category }.associateWith { category ->
+                    aggregatedTotals
+                        .filter { it.category == category }
+                        .map {
+                            val recentTransactions =
+                                transactions.filter { item -> item.currency == it.currency }
+                            CurrencyTotal(
+                                currency = it.currency,
+                                totalAmount = it.sum,
+                                recentTransactions = recentTransactions.take(3),
+                                hasMoreTransactions = recentTransactions.size > 3
+                            )
+                        }
+                }
 
             DashboardResponse(
                 categories = categoriesMap,

@@ -5,11 +5,13 @@ import com.dmytroherez.savingstrack.domain.repo.GoalsRepo
 import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
 import com.dmytroherez.savingstrack.dto.goals.GoalItem
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_PREFIX
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_SET_COMPLETED
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_ADD
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_LIST
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 
@@ -36,6 +38,16 @@ class GoalsRepoImpl(
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "GoalsRepoImpl.getGoals()" }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun completeGoal(goalId: Int): Result<Unit> {
+        return try {
+            httpClient.patch("$PATH_GOALS_PREFIX$PATH_GOALS_SET_COMPLETED/$goalId")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Logger.e(e) { "GoalsRepoImpl.completeGoal()" }
             Result.failure(e)
         }
     }

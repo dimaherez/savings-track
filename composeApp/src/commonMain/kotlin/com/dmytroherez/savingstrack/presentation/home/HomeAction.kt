@@ -5,4 +5,5 @@ import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
 sealed interface HomeAction {
     data object ToggleAddGoalDialog : HomeAction
     data class AddGoal(val request: CreateGoalRequest) : HomeAction
+    data class CompleteGoal(val goalId: Int) : HomeAction
 }

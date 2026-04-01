@@ -25,6 +25,7 @@ object Constants {
     // dates
     const val FIELD_CREATED_AT = "createdAt"
     const val FIELD_DEADLINE = "deadline"
+    const val FIELD_COMPLETED_AT = "deadline"
 
     // title and description
     const val FIELD_TITLE = "title"

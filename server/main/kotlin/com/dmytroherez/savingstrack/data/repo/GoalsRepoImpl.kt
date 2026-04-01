@@ -13,7 +13,6 @@ import com.dmytroherez.savingstrack.domain.repo.GoalsRepo
 import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
 import com.dmytroherez.savingstrack.dto.goals.GoalItem
 import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
-import org.jetbrains.exposed.v1.core.Expression
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.leftJoin
@@ -21,7 +20,9 @@ import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
+import org.jetbrains.exposed.v1.jdbc.update
 import kotlin.math.roundToInt
+import kotlin.time.Clock
 
 class GoalsRepoImpl: GoalsRepo {
     override suspend fun addGoal(userId: String, request: CreateGoalRequest) {
@@ -102,6 +103,14 @@ class GoalsRepoImpl: GoalsRepo {
                     }
 
                 goal.copy(recentTransactions = lastTransactions)
+            }
+        }
+    }
+
+    override suspend fun setAsCompleted(goalId: Int) {
+        dbQuery {
+            GoalsTable.update(where = { id eq goalId }) {
+                it[completedAt] = Clock.System.now()
             }
         }
     }

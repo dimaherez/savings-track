@@ -6,4 +6,5 @@ import com.dmytroherez.savingstrack.dto.goals.GoalItem
 interface GoalsRepo {
     suspend fun addGoal(request: CreateGoalRequest): Result<Unit>
     suspend fun getGoals() : Result<List<GoalItem>>
+    suspend fun completeGoal(goalId: Int) : Result<Unit>
 }
