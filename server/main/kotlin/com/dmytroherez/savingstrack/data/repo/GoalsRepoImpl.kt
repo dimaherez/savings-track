@@ -51,6 +51,7 @@ class GoalsRepoImpl: GoalsRepo {
                     currency,
                     deadline,
                     createdAt,
+                    completedAt,
                     currentAmountSum
                 )
                 .where { GoalsTable.firebaseUid eq userId }
@@ -60,7 +61,8 @@ class GoalsRepoImpl: GoalsRepo {
                     targetAmount,
                     currency,
                     deadline,
-                    createdAt
+                    createdAt,
+                    completedAt
                 )
                 .map { row ->
                     val targetAmount = row[targetAmount]
