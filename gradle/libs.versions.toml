@@ -9,7 +9,9 @@ cmptoast = "1.0.71"
 componentsResources = "1.10.3"
 composeMultiplatform = "1.10.3"
 datastorePreferences = "1.2.1"
+exposedMigrationJdbc = "1.2.0"
 firebaseAuth = "2.4.0"
+flywayCore = "12.3.0"
 foundation = "1.10.3"
 jwksRsa = "0.23.0"
 kermit = "2.1.0"
@@ -33,7 +35,10 @@ hikaricp = "7.0.2"
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 cmptoast = { module = "network.chaintech:cmptoast", version.ref = "cmptoast" }
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "componentsResources" }
+exposed-migration-jdbc = { module = "org.jetbrains.exposed:exposed-migration-jdbc", version.ref = "exposedMigrationJdbc" }
 firebase-auth = { module = "dev.gitlive:firebase-auth", version.ref = "firebaseAuth" }
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flywayCore" }
+flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flywayCore" }
 foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "foundation" }
 jwks-rsa = { module = "com.auth0:jwks-rsa", version.ref = "jwksRsa" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }

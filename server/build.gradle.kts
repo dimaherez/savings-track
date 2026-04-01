@@ -51,8 +51,20 @@ dependencies {
     implementation(libs.exposed.jdbc)
     implementation(libs.ktor.server.content.negotiation)
 
+    // db migration
+    implementation(libs.flyway.core)
+    implementation(libs.flyway.database.postgresql)
+    implementation(libs.exposed.migration.jdbc)
+
     // jwt token
     implementation(libs.ktor.server.auth.jvm)
     implementation(libs.ktor.server.auth.jwt.jvm)
     implementation(libs.jwks.rsa)
 }
+
+//tasks.register<JavaExec>("generateMigrations") {
+//    group = "application"
+//    description = "Generates Flyway SQL migration files from Exposed tables"
+//    mainClass.set("com.dmytroherez.savingstrack.scripts.MigrationGeneratorKt")
+//    classpath = sourceSets["main"].runtimeClasspath
+//}
