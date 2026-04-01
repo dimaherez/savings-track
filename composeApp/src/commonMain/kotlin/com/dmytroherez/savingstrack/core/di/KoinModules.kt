@@ -22,6 +22,7 @@ import com.dmytroherez.savingstrack.domain.usecase.goals.GetGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
+import com.dmytroherez.savingstrack.presentation.savings.addtransaction.AddTransactionViewModel
 import com.dmytroherez.savingstrack.presentation.transactions.TransactionsViewModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
@@ -36,10 +37,12 @@ expect val platformDataStoreModule: Module
 val dataModule = module {
     single { DataStoreRepo(dataStore = get()) }
 
-    single { createHttpClient(
-        baseUrl = "http://192.168.0.96:8080", // "http://10.10.10.110:8080"
-        firebaseAuth = Firebase.auth
-    ) }
+    single {
+        createHttpClient(
+            baseUrl = "http://192.168.0.96:8080", // "http://10.10.10.110:8080"
+            firebaseAuth = Firebase.auth
+        )
+    }
 
     single<AuthRepo> { AuthRepoImpl(firebaseAuth = Firebase.auth) }
     single<SavingsRepo> { SavingsRepoImpl(httpClient = get()) }
@@ -64,30 +67,45 @@ val domainModule = module {
 }
 
 val presentationModule = module {
-    viewModel { AuthViewModel(
-        dataStoreRepo = get(),
-        registerUC = get(),
-        loginUC = get()
-    ) }
+    viewModel {
+        AuthViewModel(
+            dataStoreRepo = get(),
+            registerUC = get(),
+            loginUC = get()
+        )
+    }
 
-    viewModel { MainViewModel(
-        getCurrentUserUC = get()
-    ) }
+    viewModel {
+        MainViewModel(
+            getCurrentUserUC = get()
+        )
+    }
 
-    viewModel { SavingsViewModel(
-        postSavingUC = get(),
-        getSavingsDashboardUC = get()
-    ) }
+    viewModel {
+        SavingsViewModel(
+            getSavingsDashboardUC = get()
+        )
+    }
 
-    viewModel { TransactionsViewModel(
-        getTransactionsByCurrencyUC = get()
-    ) }
+    viewModel {
+        AddTransactionViewModel(
+            postSavingUC = get()
+        )
+    }
 
-    viewModel { HomeViewModel(
-        addGoalUC = get(),
-        getGoalsUC = get(),
-        completeGoalUC = get()
-    ) }
+    viewModel {
+        TransactionsViewModel(
+            getTransactionsByCurrencyUC = get()
+        )
+    }
+
+    viewModel {
+        HomeViewModel(
+            addGoalUC = get(),
+            getGoalsUC = get(),
+            completeGoalUC = get()
+        )
+    }
 
     viewModelOf(::IncomeViewModel)
 }

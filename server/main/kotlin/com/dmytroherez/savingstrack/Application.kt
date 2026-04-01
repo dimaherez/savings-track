@@ -108,13 +108,13 @@ private fun initDatabase() {
 
     Database.connect(HikariDataSource(config))
 
-//    transaction {
-//        val sqlStatements = MigrationUtils.statementsRequiredForDatabaseMigration(
-//            TransactionsTable, GoalsTable
-//        )
-//
-//        println("=== SQL FOR FLYWAY ===")
-//        sqlStatements.forEach { println("$it;") }
-//        println("================================")
-//    }
+    transaction {
+        val sqlStatements = MigrationUtils.statementsRequiredForDatabaseMigration(
+            TransactionsTable, GoalsTable
+        )
+
+        println("=== SQL FOR FLYWAY ===")
+        sqlStatements.forEach { println("$it;") }
+        println("================================")
+    }
 }

@@ -36,6 +36,7 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.foundation)
             implementation(libs.material3)
+            implementation(libs.material)
             implementation(libs.ui)
             implementation(libs.components.resources)
             implementation(libs.ui.tooling.preview)
@@ -61,6 +62,7 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.tab.navigator)
             implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.bottom.sheet.navigator)
 
             // firebase
             implementation(libs.firebase.auth)

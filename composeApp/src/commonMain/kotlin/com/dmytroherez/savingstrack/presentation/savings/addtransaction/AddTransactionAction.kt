@@ -1,0 +1,15 @@
+package com.dmytroherez.savingstrack.presentation.savings.addtransaction
+
+import com.dmytroherez.savingstrack.dto.goals.GoalItem
+import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
+
+sealed interface AddTransactionAction {
+    data class OnCurrencyChange(val value: String) : AddTransactionAction
+    data class OnAmountChange(val value: String) : AddTransactionAction
+    data class OnCategoryChange(val value: SavingCategory) : AddTransactionAction
+    data class OnDescriptionChange(val value: String) : AddTransactionAction
+    data class OnSetGoal(val goal: GoalItem?) : AddTransactionAction
+
+    data object OnSaveClick : AddTransactionAction
+    data object OnCancelClick : AddTransactionAction
+}

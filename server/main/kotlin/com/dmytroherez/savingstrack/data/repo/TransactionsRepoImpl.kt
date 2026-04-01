@@ -49,7 +49,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                 .orderBy(createdAt, SortOrder.DESC)
 
             TransactionsByCurrencyResponse (
-                totalAmount = transactionsRaw.map { it[amount].toULong() }.reduce { amount1, amount2 -> amount1 + amount2},
+                totalAmount = transactionsRaw.map { it[amount] }.reduce { amount1, amount2 -> amount1 + amount2},
                 transactions = transactionsRaw.map {
                     TransactionItem(
                         id = it[TransactionsTable.id],

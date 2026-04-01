@@ -5,7 +5,7 @@ import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 
 data class TransactionsState(
     val transactions: List<TransactionItem> = emptyList(),
-    val totalAmount: Double = 0.0,
+    val totalAmount: Long = 0L,
     val isLoading: Boolean = false,
     val currency: String = ""
 ) : BaseUiState
