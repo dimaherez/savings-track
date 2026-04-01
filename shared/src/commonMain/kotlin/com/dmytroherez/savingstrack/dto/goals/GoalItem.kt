@@ -14,6 +14,7 @@ data class GoalItem(
     val currency: String,
     val progressPercentage: Int,
     val createdAt: Instant,
+    val completedAt: Instant?,
     val deadline: LocalDate? = null,
     val recentTransactions: List<TransactionItem> = emptyList()
 )

@@ -1,6 +1,7 @@
 package com.dmytroherez.savingstrack.data.repo
 
 import com.dmytroherez.savingstrack.data.tables.GoalsTable
+import com.dmytroherez.savingstrack.data.tables.GoalsTable.completedAt
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.createdAt
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.currency
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.deadline
@@ -80,7 +81,8 @@ class GoalsRepoImpl: GoalsRepo {
                         currency = row[currency],
                         progressPercentage = progressPercentage,
                         deadline = row[deadline],
-                        createdAt = row[createdAt]
+                        createdAt = row[createdAt],
+                        completedAt = row[completedAt]
                     )
                 }
 
