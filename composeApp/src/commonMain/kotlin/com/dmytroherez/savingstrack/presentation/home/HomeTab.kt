@@ -52,6 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.dmytroherez.savingstrack.core.presentation.Extensions.toAmountMinorUnits
+import com.dmytroherez.savingstrack.core.presentation.Extensions.toDisplayAmount
 import com.dmytroherez.savingstrack.core.presentation.components.AppDropdown
 import com.dmytroherez.savingstrack.core.presentation.components.AppFormDialog
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
@@ -200,7 +202,7 @@ private fun LazyListScope.listItems(
                         }
 
                         GoalProgressBar(
-                            progress = goalItem.progressPercentage / 100f,
+                            progress = goalItem.progress,
                             amount = goalItem.currentAmount,
                             currency = goalItem.currency
                         )
@@ -234,7 +236,7 @@ private fun LazyListScope.listItems(
 @Composable
 fun GoalProgressBar(
     progress: Float,
-    amount: Double,
+    amount: Long,
     currency: String,
     modifier: Modifier = Modifier
 ) {
@@ -320,7 +322,7 @@ fun CreateGoalDialog(
                 Instant.fromEpochMilliseconds(millis)
                     .toLocalDateTime(TimeZone.currentSystemDefault()).date
             }
-            onSave(CreateGoalRequest(title, amount.toDouble(), selectedCurrency, deadlineDate))
+            onSave(CreateGoalRequest(title, amount.toAmountMinorUnits(), selectedCurrency, deadlineDate))
         }
     ) {
         OutlinedTextField(

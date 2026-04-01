@@ -18,7 +18,7 @@ object TransactionsTable : Table(TABLE_TRANSACTIONS) {
     val id = integer(FIELD_ID).autoIncrement()
     val firebaseUid = varchar(FIELD_FIREBASE_UID, 128)
     val currency = varchar(FIELD_CURRENCY, 10)
-    val amount = double(FIELD_AMOUNT)
+    val amount = long(FIELD_AMOUNT)
     val description = varchar(FIELD_DESCRIPTION, 255).nullable()
     val category = enumerationByName(FIELD_CATEGORY, 50, SavingCategory::class)
     val createdAt = timestamp(FIELD_CREATED_AT).defaultExpression(CurrentTimestamp)

@@ -22,17 +22,16 @@ import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
-import kotlin.math.roundToInt
 import kotlin.time.Clock
 
-class GoalsRepoImpl: GoalsRepo {
+class GoalsRepoImpl : GoalsRepo {
     override suspend fun addGoal(userId: String, request: CreateGoalRequest) {
         dbQuery {
             GoalsTable
                 .insert {
                     it[firebaseUid] = userId
                     it[title] = request.title
-                    it[targetAmount] = request.targetAmount
+                    it[targetAmount] = request.targetAmountInMinorUnits
                     it[currency] = request.currency
                     it[deadline] = request.deadline
                 }[id]
@@ -45,35 +44,19 @@ class GoalsRepoImpl: GoalsRepo {
 
             val goals = GoalsTable.leftJoin(TransactionsTable, { id }, { TransactionsTable.goalId })
                 .select(
-                    id,
-                    title,
-                    targetAmount,
-                    currency,
-                    deadline,
-                    createdAt,
-                    completedAt,
-                    currentAmountSum
+                    GoalsTable.columns + currentAmountSum
                 )
                 .where { GoalsTable.firebaseUid eq userId }
                 .groupBy(
-                    id,
-                    title,
-                    targetAmount,
-                    currency,
-                    deadline,
-                    createdAt,
-                    completedAt
+                    *GoalsTable.columns.toTypedArray()
                 )
                 .map { row ->
                     val targetAmount = row[targetAmount]
 
-                    val currentAmount = row[currentAmountSum] ?: 0.0
+                    val currentAmount = row[currentAmountSum] ?: 0
 
-                    val progressPercentage = if (targetAmount > 0.0) {
-                        ((currentAmount / targetAmount) * 100).roundToInt()
-                    } else {
-                        0
-                    }
+                    val progress =
+                        (currentAmount / targetAmount).toFloat().takeIf { targetAmount > 0 } ?: 0f
 
                     GoalItem(
                         id = row[id],
@@ -81,7 +64,7 @@ class GoalsRepoImpl: GoalsRepo {
                         targetAmount = targetAmount,
                         currentAmount = currentAmount,
                         currency = row[currency],
-                        progressPercentage = progressPercentage,
+                        progress = progress,
                         deadline = row[deadline],
                         createdAt = row[createdAt],
                         completedAt = row[completedAt]

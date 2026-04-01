@@ -12,7 +12,7 @@ data class DashboardResponse(
 @Serializable
 data class CurrencyTotal(
     val currency: String,
-    val totalAmount: Double,
+    val totalAmount: Long,
     val recentTransactions: List<TransactionItem>,
     val hasMoreTransactions: Boolean
 )

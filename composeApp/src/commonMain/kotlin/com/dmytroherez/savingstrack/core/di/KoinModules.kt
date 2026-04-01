@@ -75,7 +75,6 @@ val presentationModule = module {
     ) }
 
     viewModel { SavingsViewModel(
-        getTransactionsByCurrencyUC = get(),
         postSavingUC = get(),
         getSavingsDashboardUC = get()
     ) }

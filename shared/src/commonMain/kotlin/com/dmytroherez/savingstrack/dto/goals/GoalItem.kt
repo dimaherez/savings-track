@@ -9,10 +9,10 @@ import kotlin.time.Instant
 data class GoalItem(
     val id: Int,
     val title: String,
-    val targetAmount: Double,
-    val currentAmount: Double,
+    val targetAmount: Long,
+    val currentAmount: Long,
     val currency: String,
-    val progressPercentage: Int,
+    val progress: Float,
     val createdAt: Instant,
     val completedAt: Instant?,
     val deadline: LocalDate? = null,

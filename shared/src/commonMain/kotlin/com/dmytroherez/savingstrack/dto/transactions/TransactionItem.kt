@@ -8,7 +8,7 @@ data class TransactionItem(
     val id: Int,
     val userId: String,
     val currency: String,
-    val amount: Double,
+    val amount: Long,
     val description: String? = null,
     val category: SavingCategory,
     val createdAt: Instant

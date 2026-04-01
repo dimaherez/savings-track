@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreateGoalRequest(
     val title: String,
-    val targetAmount: Double,
+    val targetAmountInMinorUnits: Long,
     val currency: String,
     val deadline: LocalDate? = null
 )

@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TransactionsByCurrencyResponse(
-    val totalAmount: Double,
+    val totalAmount: ULong,
     val transactions: List<TransactionItem>
 )

@@ -5,5 +5,5 @@ import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 data class TransactionsAggregatedTotal(
     val category: SavingCategory,
     val currency: String,
-    val sum: Double
+    val sum: Long
 )

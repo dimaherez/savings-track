@@ -4,12 +4,12 @@ import co.touchlab.kermit.Logger
 import java.text.NumberFormat
 import java.util.Currency
 
-actual fun formatAsFiat(amount: Double, currencyCode: String, showSign: Boolean): String {
+actual fun formatAsFiat(amount: Long, currencyCode: String, showSign: Boolean): String {
     return try {
         val formattedAmount = NumberFormat.getCurrencyInstance().apply {
             maximumFractionDigits = 2
             currency = Currency.getInstance(currencyCode)
-        }.format(amount)
+        }.format(amount / 100.0)
 
         if (showSign && amount > 0) {
             "+$formattedAmount"

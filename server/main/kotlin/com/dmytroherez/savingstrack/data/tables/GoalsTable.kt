@@ -18,7 +18,7 @@ object GoalsTable : Table(TABLE_GOALS) {
     val id = integer(FIELD_ID).autoIncrement()
     val firebaseUid = varchar(FIELD_FIREBASE_UID, 128)
     val title = varchar(FIELD_TITLE, 255)
-    val targetAmount = double(FIELD_TARGET_AMOUNT)
+    val targetAmount = long(FIELD_TARGET_AMOUNT)
     val currency = varchar(FIELD_CURRENCY, 3)
     val deadline = date(FIELD_DEADLINE).nullable()
     val createdAt = timestamp(FIELD_CREATED_AT).defaultExpression(CurrentTimestamp)

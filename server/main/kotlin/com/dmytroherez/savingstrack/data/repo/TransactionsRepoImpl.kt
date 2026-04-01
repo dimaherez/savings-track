@@ -29,7 +29,7 @@ class TransactionsRepoImpl : TransactionsRepo {
         dbQuery {
             TransactionsTable.insert {
                 it[currency] = transaction.currency
-                it[amount] = transaction.amount
+                it[amount] = transaction.amountInMinorUnits
                 it[description] = transaction.description
                 it[firebaseUid] = uid
                 it[category] = transaction.category
@@ -49,7 +49,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                 .orderBy(createdAt, SortOrder.DESC)
 
             TransactionsByCurrencyResponse (
-                totalAmount = transactionsRaw.map { it[amount] }.reduce { amount1, amount2 -> amount1 + amount2},
+                totalAmount = transactionsRaw.map { it[amount].toULong() }.reduce { amount1, amount2 -> amount1 + amount2},
                 transactions = transactionsRaw.map {
                     TransactionItem(
                         id = it[TransactionsTable.id],
@@ -76,7 +76,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                 .map { row ->
                     val category = row[category]
                     val currency = row[currency]
-                    val sum = row[totalAmount] ?: 0.0
+                    val sum = row[totalAmount] ?: 0L
                     TransactionsAggregatedTotal(category, currency, sum)
                 }
 
@@ -101,7 +101,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                     GoalsTable.id,
                     GoalsTable.title
                 )
-                .where { GoalsTable.firebaseUid eq userId }
+                .where { (GoalsTable.firebaseUid eq userId) and (GoalsTable.completedAt eq null) }
                 .orderBy(GoalsTable.createdAt to SortOrder.DESC)
                 .map {
                     GoalForTransactionItem(
