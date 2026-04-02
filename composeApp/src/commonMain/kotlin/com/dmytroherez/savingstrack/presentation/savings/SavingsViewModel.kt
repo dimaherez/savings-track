@@ -10,14 +10,14 @@ import kotlinx.coroutines.launch
 
 class SavingsViewModel(
     private val getSavingsDashboardUC: GetSavingsDashboardUC
-) : BaseViewModel<SavingsState, SavingsEvent>(
+) : BaseViewModel<SavingsState, SavingsEvent, SavingsAction>(
     SavingsState()
 ) {
     init {
         getSavingsDashboard()
     }
 
-    fun onAction(action: SavingsAction) {
+    override fun onAction(action: SavingsAction) {
         when (action) {
             else -> {}
         }

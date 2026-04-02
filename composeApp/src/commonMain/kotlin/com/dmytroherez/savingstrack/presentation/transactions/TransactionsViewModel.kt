@@ -10,11 +10,11 @@ import kotlinx.coroutines.launch
 
 class TransactionsViewModel(
     private val getTransactionsByCurrencyUC: GetTransactionsByCurrencyUC
-) : BaseViewModel<TransactionsState, TransactionsEvent>(
+) : BaseViewModel<TransactionsState, TransactionsEvent, TransactionsAction>(
     TransactionsState()
 ) {
 
-    fun onAction(action: TransactionsAction) {
+    override fun onAction(action: TransactionsAction) {
         when(action) {
             TransactionsAction.SomeAction -> Unit
         }

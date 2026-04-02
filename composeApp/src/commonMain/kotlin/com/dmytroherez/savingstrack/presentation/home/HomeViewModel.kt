@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     private val getGoalsUC: GetGoalsUC,
     private val completeGoalUC: CompleteGoalUC
-) : BaseViewModel<HomeState, HomeEvent>(
+) : BaseViewModel<HomeState, HomeEvent, HomeAction>(
     HomeState()
 ) {
 
@@ -20,7 +20,7 @@ class HomeViewModel(
         getGoals()
     }
 
-    fun onAction(action: HomeAction) {
+    override fun onAction(action: HomeAction) {
         when (action) {
             is HomeAction.CompleteGoal -> completeGoal(action.goalId)
         }

@@ -1,8 +1,9 @@
 package com.dmytroherez.savingstrack.presentation.auth
 
+import com.dmytroherez.savingstrack.core.presentation.BaseAction
 import com.dmytroherez.savingstrack.domain.UserModel
 
-sealed interface AuthAction {
+sealed interface AuthAction : BaseAction {
     data class OnEmailInputChanged(val emailText: String): AuthAction
     data class OnPasswordInputChanged(val passwordText: String): AuthAction
     data object SubmitAuthAction: AuthAction

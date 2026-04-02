@@ -14,11 +14,11 @@ import savingstrack.composeapp.generated.resources.success
 
 class AddTransactionViewModel(
     private val postSavingUC: PostSavingUC,
-) : BaseViewModel<AddTransactionState, AddTransactionEvent>(
+) : BaseViewModel<AddTransactionState, AddTransactionEvent, AddTransactionAction>(
     AddTransactionState()
 ) {
 
-    fun onAction(
+    override fun onAction(
         action: AddTransactionAction
     ) {
         when(action) {

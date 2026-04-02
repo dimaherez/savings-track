@@ -15,10 +15,10 @@ class AuthViewModel(
     private val dataStoreRepo: DataStoreRepo,
     private val registerUC: RegisterUC,
     private val loginUC: LoginUC
-) : BaseViewModel<AuthState, AuthEvent>(
+) : BaseViewModel<AuthState, AuthEvent, AuthAction>(
     AuthState()
 ) {
-    fun onAction(action: AuthAction) {
+    override fun onAction(action: AuthAction) {
         when (action) {
             is AuthAction.OnEmailInputChanged -> {
                 updateState {

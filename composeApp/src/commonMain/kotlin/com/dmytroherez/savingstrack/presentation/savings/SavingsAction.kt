@@ -1,5 +1,7 @@
 package com.dmytroherez.savingstrack.presentation.savings
 
-sealed interface SavingsAction {
+import com.dmytroherez.savingstrack.core.presentation.BaseAction
+
+sealed interface SavingsAction : BaseAction {
 
 }

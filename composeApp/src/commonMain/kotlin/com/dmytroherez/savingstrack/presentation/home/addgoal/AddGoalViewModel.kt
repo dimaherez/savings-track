@@ -15,12 +15,11 @@ import kotlin.time.Instant
 
 class AddGoalViewModel(
     private val addGoalUC: AddGoalUC
-) : BaseViewModel<AddGoalState, AddGoalEvent>(
+) : BaseViewModel<AddGoalState, AddGoalEvent, AddGoalAction>(
     AddGoalState()
 ) {
 
-
-    fun onAction(action: AddGoalAction) {
+    override fun onAction(action: AddGoalAction) {
         when(action) {
             is AddGoalAction.OnTitleChange -> updateState { it.copy(title = action.value) }
             is AddGoalAction.OnAmountChange -> updateState { it.copy(amount = action.value) }

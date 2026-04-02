@@ -1,9 +1,10 @@
 package com.dmytroherez.savingstrack.presentation.savings.addtransaction
 
+import com.dmytroherez.savingstrack.core.presentation.BaseAction
 import com.dmytroherez.savingstrack.dto.goals.GoalItem
 import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 
-sealed interface AddTransactionAction {
+sealed interface AddTransactionAction : BaseAction {
     data class OnCurrencyChange(val value: String) : AddTransactionAction
     data class OnAmountChange(val value: String) : AddTransactionAction
     data class OnCategoryChange(val value: SavingCategory) : AddTransactionAction

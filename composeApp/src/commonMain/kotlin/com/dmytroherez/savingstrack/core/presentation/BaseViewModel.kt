@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<S : BaseUiState, E : BaseUiEvent>(
+abstract class BaseViewModel<S : BaseUiState, E : BaseUiEvent, A: BaseAction>(
     initialState: S
 ) : ViewModel() {
 
@@ -19,6 +19,8 @@ abstract class BaseViewModel<S : BaseUiState, E : BaseUiEvent>(
 
     private val _event = Channel<E>()
     val event = _event.receiveAsFlow()
+
+    abstract fun onAction(action: A)
 
     protected fun updateState(reducer: (S) -> S) {
         _uiState.update(reducer)
@@ -35,3 +37,5 @@ interface BaseUiState
 interface BaseUiEvent {
     data class ShowToast(val message: UiText) : BaseUiEvent
 }
+
+interface BaseAction
