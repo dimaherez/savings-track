@@ -13,4 +13,5 @@ object RoutePath {
     // Goals
     const val PATH_GOALS_PREFIX = "/goals"
     const val PATH_GOALS_SET_COMPLETED = "/complete"
+    const val PATH_GOALS_AVAILABLE = "/available"
 }

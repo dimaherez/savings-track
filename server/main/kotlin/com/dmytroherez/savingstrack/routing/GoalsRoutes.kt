@@ -4,6 +4,7 @@ import com.dmytroherez.savingstrack.Constants.FIELD_GOAL_ID
 import com.dmytroherez.savingstrack.Constants.JWT_NAME
 import com.dmytroherez.savingstrack.domain.repo.GoalsRepo
 import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
+import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_AVAILABLE
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_PREFIX
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_SET_COMPLETED
 import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_ADD
@@ -30,6 +31,15 @@ fun Routing.goalsRoutes() {
                     call.respond(
                         status = HttpStatusCode.OK,
                         message = repository.getGoals(uid)
+                    )
+                }
+            }
+
+            get("$PATH_SUFFIX_LIST/$PATH_GOALS_AVAILABLE") {
+                withSecureUid { uid ->
+                    call.respond(
+                        status = HttpStatusCode.OK,
+                        message = repository.getGoalsForTransaction(uid)
                     )
                 }
             }

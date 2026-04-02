@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.Extensions.toAmountMinorUnits
 import com.dmytroherez.savingstrack.core.presentation.UiText
+import com.dmytroherez.savingstrack.domain.usecase.goals.GetAvailableGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
 import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
 import kotlinx.coroutines.Dispatchers
@@ -14,9 +15,14 @@ import savingstrack.composeapp.generated.resources.success
 
 class AddTransactionViewModel(
     private val postSavingUC: PostSavingUC,
+    private val getAvailableGoalsUC: GetAvailableGoalsUC
 ) : BaseViewModel<AddTransactionState, AddTransactionEvent, AddTransactionAction>(
     AddTransactionState()
 ) {
+
+    init {
+        getAvailableGoals()
+    }
 
     override fun onAction(
         action: AddTransactionAction
@@ -59,6 +65,21 @@ class AddTransactionViewModel(
                     )
                     sendEvent(AddTransactionEvent.CloseBottomSheet)
                     updateState { it.copy(isLoading = false) }
+                }
+                .onFailure { err ->
+                    sendEvent(
+                        AddTransactionEvent.ShowToast(UiText.DynamicString(err.message))
+                    )
+                    updateState { it.copy(isLoading = false) }
+                }
+        }
+    }
+
+    private fun getAvailableGoals() {
+        viewModelScope.launch(Dispatchers.IO) {
+            getAvailableGoalsUC()
+                .onSuccess { result ->
+                    updateState { it.copy(availableGoals = result) }
                 }
                 .onFailure { err ->
                     sendEvent(

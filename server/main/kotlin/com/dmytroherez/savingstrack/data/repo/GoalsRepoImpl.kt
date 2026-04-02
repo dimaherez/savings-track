@@ -5,6 +5,7 @@ import com.dmytroherez.savingstrack.data.tables.GoalsTable.completedAt
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.createdAt
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.currency
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.deadline
+import com.dmytroherez.savingstrack.data.tables.GoalsTable.firebaseUid
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.id
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.targetAmount
 import com.dmytroherez.savingstrack.data.tables.GoalsTable.title
@@ -12,14 +13,18 @@ import com.dmytroherez.savingstrack.data.tables.TransactionsTable
 import com.dmytroherez.savingstrack.dbQuery
 import com.dmytroherez.savingstrack.domain.repo.GoalsRepo
 import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
+import com.dmytroherez.savingstrack.dto.goals.GoalForTransactionItem
 import com.dmytroherez.savingstrack.dto.goals.GoalItem
 import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.core.and
 import org.jetbrains.exposed.v1.core.eq
 import org.jetbrains.exposed.v1.core.leftJoin
+import org.jetbrains.exposed.v1.core.max
 import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
+import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 import kotlin.time.Clock
 
@@ -43,17 +48,11 @@ class GoalsRepoImpl : GoalsRepo {
 
             val goals = GoalsTable.leftJoin(TransactionsTable, { id }, { TransactionsTable.goalId })
                 .select(GoalsTable.columns + currentAmountSum)
-                .where { GoalsTable.firebaseUid eq userId }
+                .where { firebaseUid eq userId }
                 .groupBy(*GoalsTable.columns.toTypedArray())
                 .map { row ->
                     val targetAmount = row[targetAmount]
                     val currentAmount = row[currentAmountSum] ?: 0L
-
-                    val progress = if (targetAmount > 0L) {
-                        currentAmount.toFloat() / targetAmount.toFloat()
-                    } else {
-                        0f
-                    }
 
                     GoalItem(
                         id = row[id],
@@ -61,7 +60,7 @@ class GoalsRepoImpl : GoalsRepo {
                         targetAmount = targetAmount,
                         currentAmount = currentAmount,
                         currency = row[currency],
-                        progress = progress,
+                        progress = calculateProgress(targetAmount, currentAmount),
                         deadline = row[deadline],
                         createdAt = row[createdAt],
                         completedAt = row[completedAt],
@@ -103,6 +102,41 @@ class GoalsRepoImpl : GoalsRepo {
             GoalsTable.update(where = { id eq goalId }) {
                 it[completedAt] = Clock.System.now()
             }
+        }
+    }
+
+    override suspend fun getGoalsForTransaction(userId: String): List<GoalForTransactionItem> {
+        return dbQuery {
+            val currentAmountSum = TransactionsTable.amount.sum()
+            val lastTransactionTime = TransactionsTable.createdAt.max()
+
+            val goalsTableColumns = listOf(id, title, targetAmount)
+            val aggregatedColumns = listOf(currentAmountSum, lastTransactionTime)
+
+            GoalsTable.leftJoin(TransactionsTable, { id }, { TransactionsTable.goalId })
+                .select(goalsTableColumns + aggregatedColumns)
+                .where { (firebaseUid eq userId) and (completedAt eq null) }
+                .groupBy(*goalsTableColumns.toTypedArray())
+                .map { row ->
+                    val targetAmount = row[targetAmount]
+                    val currentAmount = row[currentAmountSum] ?: 0L
+
+                    GoalForTransactionItem(
+                        id = row[id],
+                        title = row[title],
+                        lastTransaction = row[lastTransactionTime],
+                        progress = calculateProgress(targetAmount, currentAmount),
+                        targetAmount = targetAmount,
+                        currentAmount = currentAmount
+                    )
+                }
+        }
+    }
+    private fun calculateProgress(targetAmount: Long, currentAmount: Long): Float {
+        return if (targetAmount > 0L) {
+            currentAmount.toFloat() / targetAmount.toFloat()
+        } else {
+            0f
         }
     }
 }

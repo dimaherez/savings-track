@@ -82,17 +82,6 @@ class TransactionsRepoImpl : TransactionsRepo {
                     )
                 }
 
-            val goals = GoalsTable
-                .select(GoalsTable.id, GoalsTable.title)
-                .where { (GoalsTable.firebaseUid eq userId) and (GoalsTable.completedAt eq null) }
-                .orderBy(GoalsTable.createdAt to SortOrder.DESC)
-                .map { row ->
-                    GoalForTransactionItem(
-                        id = row[GoalsTable.id],
-                        title = row[GoalsTable.title]
-                    )
-                }
-
             val categoriesMap = aggregatedTotals
                 .groupBy { it.category }
                 .mapValues { (currentCategory, categoryBuckets) ->
@@ -129,8 +118,7 @@ class TransactionsRepoImpl : TransactionsRepo {
                 }
 
             DashboardResponse(
-                categories = categoriesMap,
-                availableGoals = goals
+                categories = categoriesMap
             )
         }
     }
