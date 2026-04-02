@@ -34,8 +34,5 @@ abstract class BaseViewModel<S : BaseUiState, E : BaseUiEvent, A: BaseAction>(
 }
 
 interface BaseUiState
-interface BaseUiEvent {
-    data class ShowToast(val message: UiText) : BaseUiEvent
-}
-
+interface BaseUiEvent
 interface BaseAction

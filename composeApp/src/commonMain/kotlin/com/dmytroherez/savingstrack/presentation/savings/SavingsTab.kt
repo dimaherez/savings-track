@@ -1,44 +1,32 @@
 package com.dmytroherez.savingstrack.presentation.savings
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuAnchorType
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -50,7 +38,8 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.LocalRootNavigator
 import com.dmytroherez.savingstrack.core.presentation.components.PreviewWithTheme
-import com.dmytroherez.savingstrack.core.utils.formatAsFiat
+import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonRound
+import com.dmytroherez.savingstrack.core.presentation.components.listitem.CurrencyTotalItemContent
 import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
 import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
 import com.dmytroherez.savingstrack.presentation.savings.addtransaction.AddTransactionBottomSheet
@@ -168,30 +157,25 @@ private fun SavingsScreenContent(
                 }
             }
 
-//            Text(
-//                modifier = Modifier
-//                    .weight(1f)
-//                    .clip(RoundedCornerShape(24.dp))
-//                    .fillMaxWidth()
-//                    .background(MaterialTheme.colorScheme.secondaryContainer),
-//                textAlign = TextAlign.Center,
-//                text = "*Chart*",
-//                style = MaterialTheme.typography.headlineLarge
-//            )
-
             LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .weight(1f)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val category = SavingCategory.entries[pagerState.currentPage]
-                listItems(
-                    currencyTotals = state.savings?.categories[category] ?: emptyList(),
-                    onViewAllClick = { currency ->
-                        onNavigateToCurrencyTransactions(currency)
+                (state.savings?.categories[SavingCategory.entries[pagerState.currentPage]] ?: emptyList())
+                    .forEach { currencyTotal ->
+                        item(
+                            contentType = CurrencyTotal,
+                            key = currencyTotal.currency
+                        ) {
+                            CurrencyTotalItemContent(
+                                currencyTotal,
+                                onViewAllClick = { currency ->
+                                    onNavigateToCurrencyTransactions(
+                                        currency
+                                    )
+                                }
+                            )
+                        }
                     }
-                )
             }
         }
 
@@ -201,90 +185,14 @@ private fun SavingsScreenContent(
             )
         }
 
-        TextButton(
+        ButtonRound(
             modifier = Modifier
                 .padding(end = 36.dp, bottom = 36.dp)
-                .align(Alignment.BottomEnd)
-                .clip(CircleShape)
-                .size(48.dp)
-                .background(color = MaterialTheme.colorScheme.primary),
-            onClick = {
-                showAddTransactionDialog()
-            }
-        ) {
-            Text(
-                text = "+",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-        }
-
+                .align(Alignment.BottomEnd),
+            imageVector = Icons.Filled.Add,
+            onCLick = showAddTransactionDialog
+        )
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-private fun LazyListScope.listItems(
-    currencyTotals: List<CurrencyTotal>,
-    onViewAllClick: (currency: String) -> Unit
-) {
-    currencyTotals
-        .forEach { savingItem ->
-            item {
-                var dropdownExpanded by remember { mutableStateOf(false) }
-                ExposedDropdownMenuBox(
-                    expanded = dropdownExpanded,
-                    onExpandedChange = { dropdownExpanded = !dropdownExpanded }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(savingItem.currency)
-                        Text(formatAsFiat(savingItem.totalAmount, savingItem.currency))
-                    }
-                    ExposedDropdownMenu(
-                        expanded = dropdownExpanded,
-                        onDismissRequest = { dropdownExpanded = false }
-                    ) {
-                        savingItem.recentTransactions.forEach { transaction ->
-                            DropdownMenuItem(
-                                text = {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 8.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Text(transaction.createdAt.toString())
-                                        Text(formatAsFiat(transaction.amount, savingItem.currency, showSign = true))
-                                    }
-                                },
-                                onClick = {}
-                            )
-                        }
-                        if (savingItem.hasMoreTransactions) {
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        modifier = Modifier.fillMaxSize(),
-                                        text = "View all transactions",
-                                        color = MaterialTheme.colorScheme.primary,
-                                        textAlign = TextAlign.Center
-                                    )
-                                },
-                                onClick = {
-                                    onViewAllClick(savingItem.currency)
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
 }
 
 @Preview
