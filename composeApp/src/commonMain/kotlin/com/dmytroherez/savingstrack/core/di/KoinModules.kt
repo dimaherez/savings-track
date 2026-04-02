@@ -1,10 +1,6 @@
 package com.dmytroherez.savingstrack.core.di
 
 import com.dmytroherez.savingstrack.MainViewModel
-import com.dmytroherez.savingstrack.presentation.auth.AuthViewModel
-import com.dmytroherez.savingstrack.presentation.savings.SavingsViewModel
-import com.dmytroherez.savingstrack.presentation.home.HomeViewModel
-import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
 import com.dmytroherez.savingstrack.core.datastore.DataStoreRepo
 import com.dmytroherez.savingstrack.core.network.createHttpClient
 import com.dmytroherez.savingstrack.data.repoimpl.AuthRepoImpl
@@ -23,32 +19,39 @@ import com.dmytroherez.savingstrack.domain.usecase.goals.GetGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
+import com.dmytroherez.savingstrack.presentation.auth.AuthViewModel
+import com.dmytroherez.savingstrack.presentation.home.HomeViewModel
 import com.dmytroherez.savingstrack.presentation.home.addgoal.AddGoalViewModel
+import com.dmytroherez.savingstrack.presentation.income.IncomeViewModel
+import com.dmytroherez.savingstrack.presentation.savings.SavingsViewModel
 import com.dmytroherez.savingstrack.presentation.savings.addtransaction.AddTransactionViewModel
 import com.dmytroherez.savingstrack.presentation.transactions.TransactionsViewModel
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.auth.auth
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 
 expect val platformDataStoreModule: Module
 
-val dataModule = module {
-    single { DataStoreRepo(dataStore = get()) }
+val networkModule = module {
+    single { Firebase.auth }
 
     single {
         createHttpClient(
-            baseUrl = "http://192.168.0.96:8080", // "http://10.10.10.110:8080"
-            firebaseAuth = Firebase.auth
+            baseUrl = "http://192.168.0.96:8080", // Consider moving this to BuildConfig later!
+            firebaseAuth = get()
         )
     }
+}
 
-    single<AuthRepo> { AuthRepoImpl(firebaseAuth = Firebase.auth) }
-    single<SavingsRepo> { SavingsRepoImpl(httpClient = get()) }
-    single<GoalsRepo> { GoalsRepoImpl(httpClient = get()) }
+val dataModule = module {
+    singleOf(::DataStoreRepo)
+    singleOf(::AuthRepoImpl) bind AuthRepo::class
+    singleOf(::SavingsRepoImpl) bind SavingsRepo::class
+    singleOf(::GoalsRepoImpl) bind GoalsRepo::class
 }
 
 val domainModule = module {
@@ -70,53 +73,27 @@ val domainModule = module {
 }
 
 val presentationModule = module {
-    viewModel {
-        AuthViewModel(
-            dataStoreRepo = get(),
-            registerUC = get(),
-            loginUC = get()
-        )
-    }
+    // MainApp
+    viewModelOf(::MainViewModel)
 
-    viewModel {
-        MainViewModel(
-            getCurrentUserUC = get()
-        )
-    }
+    //Auth
+    viewModelOf(::AuthViewModel)
 
-    viewModel {
-        SavingsViewModel(
-            getSavingsDashboardUC = get()
-        )
-    }
+    // Transactions/savings
+    viewModelOf(::SavingsViewModel)
+    viewModelOf(::AddTransactionViewModel)
+    viewModelOf(::TransactionsViewModel)
 
-    viewModel {
-        AddTransactionViewModel(
-            postSavingUC = get(),
-            getAvailableGoalsUC = get()
-        )
-    }
-
-    viewModel {
-        TransactionsViewModel(
-            getTransactionsByCurrencyUC = get()
-        )
-    }
-
-    viewModel {
-        HomeViewModel(
-            getGoalsUC = get(),
-            completeGoalUC = get()
-        )
-    }
-
-    viewModel {
-        AddGoalViewModel(
-            addGoalUC = get()
-        )
-    }
-
+    // Home/goals
+    viewModelOf(::HomeViewModel)
+    viewModelOf(::AddGoalViewModel)
     viewModelOf(::IncomeViewModel)
 }
 
-fun appModule() = listOf(platformDataStoreModule, dataModule, domainModule, presentationModule)
+fun appModule() = listOf(
+    platformDataStoreModule,
+    networkModule,
+    dataModule,
+    domainModule,
+    presentationModule
+)
