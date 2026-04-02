@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.implementation
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -75,6 +74,7 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.auth)
             implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.resources)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

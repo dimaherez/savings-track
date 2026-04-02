@@ -1,8 +1,8 @@
 package com.dmytroherez.savingstrack.domain.repo
 
-import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
-import com.dmytroherez.savingstrack.dto.goals.GoalForTransactionItem
-import com.dmytroherez.savingstrack.dto.goals.GoalItem
+import com.dmytroherez.savingstrack.shared.dto.goals.CreateGoalRequest
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalForTransactionItem
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalItem
 
 interface GoalsRepo {
     suspend fun addGoal(request: CreateGoalRequest): Result<Unit>

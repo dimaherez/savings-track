@@ -28,7 +28,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.dmytroherez.savingstrack.core.presentation.components.AppDropdown
-import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
+import com.dmytroherez.savingstrack.shared.dto.transactions.SavingCategory
 import multiplatform.network.cmptoast.showToast
 import org.koin.compose.viewmodel.koinViewModel
 

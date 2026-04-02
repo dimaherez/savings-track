@@ -1,7 +1,7 @@
 ktor:
     application:
         modules:
-            - com.dmytroherez.savingstrack.ApplicationKt.module
+            - com.dmytroherez.savingstrack.server.ApplicationKt.module
     deployment:
         port: 8080
 

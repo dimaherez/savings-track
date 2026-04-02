@@ -2,19 +2,15 @@ package com.dmytroherez.savingstrack.data.repoimpl
 
 import co.touchlab.kermit.Logger
 import com.dmytroherez.savingstrack.domain.repo.GoalsRepo
-import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
-import com.dmytroherez.savingstrack.dto.goals.GoalForTransactionItem
-import com.dmytroherez.savingstrack.dto.goals.GoalItem
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_AVAILABLE
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_PREFIX
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_GOALS_SET_COMPLETED
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_ADD
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_LIST
+import com.dmytroherez.savingstrack.shared.dto.goals.CreateGoalRequest
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalForTransactionItem
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalItem
+import com.dmytroherez.savingstrack.shared.routes.GoalsRoute
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.patch
-import io.ktor.client.request.post
+import io.ktor.client.plugins.resources.get
+import io.ktor.client.plugins.resources.patch
+import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.setBody
 
 class GoalsRepoImpl(
@@ -24,7 +20,7 @@ class GoalsRepoImpl(
         request: CreateGoalRequest
     ): Result<Unit> {
         return try {
-            httpClient.post("$PATH_GOALS_PREFIX$PATH_SUFFIX_ADD") {
+            httpClient.post(GoalsRoute.Add()) {
                 setBody(request)
             }
             Result.success(Unit)
@@ -36,7 +32,7 @@ class GoalsRepoImpl(
 
     override suspend fun getGoals(): Result<List<GoalItem>> {
         return try {
-            val response = httpClient.get("$PATH_GOALS_PREFIX$PATH_SUFFIX_LIST")
+            val response = httpClient.get(GoalsRoute.ListAll())
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "GoalsRepoImpl.getGoals()" }
@@ -46,7 +42,7 @@ class GoalsRepoImpl(
 
     override suspend fun getAvailableGoals(): Result<List<GoalForTransactionItem>> {
         return try {
-            val response = httpClient.get("$PATH_GOALS_PREFIX$PATH_SUFFIX_LIST$PATH_GOALS_AVAILABLE")
+            val response = httpClient.get(GoalsRoute.Available())
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "GoalsRepoImpl.getAvailableGoals()" }
@@ -56,7 +52,7 @@ class GoalsRepoImpl(
 
     override suspend fun completeGoal(goalId: Int): Result<Unit> {
         return try {
-            httpClient.patch("$PATH_GOALS_PREFIX$PATH_GOALS_SET_COMPLETED/$goalId")
+            httpClient.patch(GoalsRoute.Complete(goalId = goalId))
             Result.success(Unit)
         } catch (e: Exception) {
             Logger.e(e) { "GoalsRepoImpl.completeGoal()" }

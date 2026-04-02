@@ -1,9 +1,8 @@
 package com.dmytroherez.savingstrack.domain.repo
 
-import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
-import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
-import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
-import com.dmytroherez.savingstrack.dto.transactions.TransactionsByCurrencyResponse
+import com.dmytroherez.savingstrack.shared.dto.transactions.DashboardResponse
+import com.dmytroherez.savingstrack.shared.dto.transactions.PostTransactionRequest
+import com.dmytroherez.savingstrack.shared.dto.transactions.TransactionsByCurrencyResponse
 
 interface SavingsRepo {
     suspend fun postSaving(

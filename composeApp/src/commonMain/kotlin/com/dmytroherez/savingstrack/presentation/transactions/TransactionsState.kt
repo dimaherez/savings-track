@@ -1,7 +1,7 @@
 package com.dmytroherez.savingstrack.presentation.transactions
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiState
-import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.shared.dto.transactions.TransactionItem
 
 data class TransactionsState(
     val transactions: List<TransactionItem> = emptyList(),

@@ -1,9 +1,7 @@
 package com.dmytroherez.savingstrack.presentation.savings
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiState
-import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
-import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
-import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.shared.dto.transactions.DashboardResponse
 
 data class SavingsState(
     val savings: DashboardResponse? = null,

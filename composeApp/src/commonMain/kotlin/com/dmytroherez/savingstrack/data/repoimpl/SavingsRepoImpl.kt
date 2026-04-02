@@ -2,17 +2,14 @@ package com.dmytroherez.savingstrack.data.repoimpl
 
 import co.touchlab.kermit.Logger
 import com.dmytroherez.savingstrack.domain.repo.SavingsRepo
-import com.dmytroherez.savingstrack.dto.transactions.DashboardResponse
-import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
-import com.dmytroherez.savingstrack.dto.transactions.TransactionsByCurrencyResponse
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_DASHBOARD
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_LIST
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_SUFFIX_ADD
-import com.dmytroherez.savingstrack.routes.RoutePath.PATH_TRANSACTIONS_PREFIX
+import com.dmytroherez.savingstrack.shared.dto.transactions.DashboardResponse
+import com.dmytroherez.savingstrack.shared.dto.transactions.PostTransactionRequest
+import com.dmytroherez.savingstrack.shared.dto.transactions.TransactionsByCurrencyResponse
+import com.dmytroherez.savingstrack.shared.routes.TransactionsRoute
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.post
+import io.ktor.client.plugins.resources.get
+import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.setBody
 
 class SavingsRepoImpl(
@@ -22,7 +19,7 @@ class SavingsRepoImpl(
         request: PostTransactionRequest
     ): Result<Unit> {
         return try {
-            httpClient.post("$PATH_TRANSACTIONS_PREFIX$PATH_SUFFIX_ADD") {
+            httpClient.post(TransactionsRoute.Add()) {
                 setBody(request)
             }
             Result.success(Unit)
@@ -34,7 +31,8 @@ class SavingsRepoImpl(
 
     override suspend fun getTransactionsByCurrency(currency: String): Result<TransactionsByCurrencyResponse> {
         return try {
-            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_SUFFIX_LIST/$currency")
+            val response =
+                httpClient.get(TransactionsRoute.GetByCurrency(currency = currency))
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "SavingsRepoImpl.getSavings()" }
@@ -44,7 +42,7 @@ class SavingsRepoImpl(
 
     override suspend fun getSavingsDashboard(): Result<DashboardResponse> {
         return try {
-            val response = httpClient.get("$PATH_TRANSACTIONS_PREFIX$PATH_TRANSACTIONS_DASHBOARD")
+            val response = httpClient.get(TransactionsRoute.Dashboard())
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "SavingsRepoImpl.getSavingsDashboard()" }

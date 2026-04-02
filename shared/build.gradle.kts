@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
-group = "com.dmytroherez.savingstrack"
+group = "com.dmytroherez.savingstrack.shared"
 version = "unspecified"
 
 kotlin {
@@ -18,6 +18,7 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.ktor.resources)
         }
     }
 }

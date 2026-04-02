@@ -1,8 +1,8 @@
 package com.dmytroherez.savingstrack.presentation.savings.addtransaction
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiState
-import com.dmytroherez.savingstrack.dto.goals.GoalForTransactionItem
-import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalForTransactionItem
+import com.dmytroherez.savingstrack.shared.dto.transactions.SavingCategory
 
 data class AddTransactionState(
     val availableGoals: List<GoalForTransactionItem> = emptyList(),

@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import com.dmytroherez.savingstrack.core.presentation.components.listitem.TransactionDropdownItemContent
-import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.shared.dto.transactions.TransactionItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
 }
 
-group = "com.dmytroherez.savingstrack"
+group = "com.dmytroherez.savingstrack.server"
 version = "0.0.1"
 
 application {
@@ -33,6 +33,7 @@ dependencies {
 
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.ktor.server.resources)
 
     // Koin
     implementation(project.dependencies.platform(libs.koin.bom))

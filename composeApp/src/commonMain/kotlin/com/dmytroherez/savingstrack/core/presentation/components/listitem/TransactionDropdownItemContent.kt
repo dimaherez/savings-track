@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dmytroherez.savingstrack.core.presentation.Extensions.toDisplayDateTimeString
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
-import com.dmytroherez.savingstrack.dto.transactions.TransactionItem
+import com.dmytroherez.savingstrack.shared.dto.transactions.TransactionItem
 
 @Composable
 fun TransactionDropdownItemContent(

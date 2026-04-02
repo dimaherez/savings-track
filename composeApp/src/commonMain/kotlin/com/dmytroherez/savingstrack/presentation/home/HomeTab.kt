@@ -32,7 +32,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.dmytroherez.savingstrack.core.presentation.components.buttons.ButtonRound
 import com.dmytroherez.savingstrack.core.presentation.components.listitem.GoalItemContent
-import com.dmytroherez.savingstrack.dto.goals.GoalItem
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalItem
 import com.dmytroherez.savingstrack.presentation.home.addgoal.AddGoalBottomSheet
 import kotlinx.coroutines.flow.collectLatest
 import multiplatform.network.cmptoast.showToast

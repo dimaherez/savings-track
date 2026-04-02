@@ -1,7 +1,7 @@
 package com.dmytroherez.savingstrack.presentation.home
 
 import com.dmytroherez.savingstrack.core.presentation.BaseUiState
-import com.dmytroherez.savingstrack.dto.goals.GoalItem
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalItem
 
 data class HomeState(
     val goals: List<GoalItem> = emptyList(),

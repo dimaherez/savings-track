@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.dmytroherez.savingstrack.core.presentation.components.dropdown.TransactionsDropdownMenu
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
-import com.dmytroherez.savingstrack.dto.transactions.CurrencyTotal
+import com.dmytroherez.savingstrack.shared.dto.transactions.CurrencyTotal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

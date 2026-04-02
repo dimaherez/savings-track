@@ -5,7 +5,7 @@ import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.Extensions.toAmountMinorUnits
 import com.dmytroherez.savingstrack.core.presentation.UiText
 import com.dmytroherez.savingstrack.domain.usecase.goals.AddGoalUC
-import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
+import com.dmytroherez.savingstrack.shared.dto.goals.CreateGoalRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch

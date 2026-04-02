@@ -6,7 +6,7 @@ import com.dmytroherez.savingstrack.core.presentation.Extensions.toAmountMinorUn
 import com.dmytroherez.savingstrack.core.presentation.UiText
 import com.dmytroherez.savingstrack.domain.usecase.goals.GetAvailableGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
-import com.dmytroherez.savingstrack.dto.transactions.PostTransactionRequest
+import com.dmytroherez.savingstrack.shared.dto.transactions.PostTransactionRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch

@@ -32,7 +32,7 @@ import com.dmytroherez.savingstrack.core.presentation.Extensions.toDisplayDateSt
 import com.dmytroherez.savingstrack.core.presentation.Extensions.toDisplayPercentageString
 import com.dmytroherez.savingstrack.core.presentation.components.dropdown.TransactionsDropdownMenu
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
-import com.dmytroherez.savingstrack.dto.goals.GoalItem
+import com.dmytroherez.savingstrack.shared.dto.goals.GoalItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
