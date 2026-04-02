@@ -17,25 +17,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,23 +40,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.dmytroherez.savingstrack.core.presentation.Extensions.toAmountMinorUnits
-import com.dmytroherez.savingstrack.core.presentation.Extensions.toDisplayAmount
-import com.dmytroherez.savingstrack.core.presentation.components.AppDropdown
-import com.dmytroherez.savingstrack.core.presentation.components.AppFormDialog
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
-import com.dmytroherez.savingstrack.dto.goals.CreateGoalRequest
 import com.dmytroherez.savingstrack.dto.goals.GoalItem
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.dmytroherez.savingstrack.presentation.home.addgoal.AddGoalBottomSheet
 import org.koin.compose.viewmodel.koinViewModel
-import kotlin.time.Instant
 
 object HomeTab: Tab {
     override val options: TabOptions
@@ -80,9 +67,14 @@ object HomeTab: Tab {
         val viewModel = koinViewModel<HomeViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
 
+        val bottomSheetNavigator = LocalBottomSheetNavigator.current
+
         HomeScreenContent(
             state = state,
-            onAction = viewModel::onAction
+            onAction = viewModel::onAction,
+            onAddGoalClick = {
+                bottomSheetNavigator.show(AddGoalBottomSheet)
+            }
         )
     }
 }
@@ -90,7 +82,8 @@ object HomeTab: Tab {
 @Composable
 private fun HomeScreenContent (
     state: HomeState,
-    onAction: (HomeAction) -> Unit
+    onAction: (HomeAction) -> Unit,
+    onAddGoalClick: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -109,10 +102,9 @@ private fun HomeScreenContent (
             }
         }
 
-        if (state.showAddGoalDialog) {
-            CreateGoalDialog(
-                onDismiss = { onAction(HomeAction.ToggleAddGoalDialog) },
-                onSave = { request -> onAction(HomeAction.AddGoal(request)) }
+        if (state.goalsLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center)
             )
         }
 
@@ -124,7 +116,7 @@ private fun HomeScreenContent (
                 .size(48.dp)
                 .background(color = MaterialTheme.colorScheme.primary),
             onClick = {
-                onAction(HomeAction.ToggleAddGoalDialog)
+                onAddGoalClick()
             }
         ) {
             Text(
@@ -280,86 +272,6 @@ fun GoalProgressBar(
                 .clip(RoundedCornerShape(50)),
             color = MaterialTheme.colorScheme.primary,
             trackColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CreateGoalDialog(
-    availableCurrencies: List<String> = listOf("USD", "EUR", "UAH"),
-    onDismiss: () -> Unit,
-    onSave: (CreateGoalRequest) -> Unit
-) {
-    var title by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var selectedCurrency by remember { mutableStateOf(availableCurrencies.first()) }
-
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
-
-    val selectedDateString = datePickerState.selectedDateMillis?.let { millis ->
-        Instant.fromEpochMilliseconds(millis)
-            .toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
-    } ?: ""
-
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = { TextButton(onClick = { showDatePicker = false }) { Text("Confirm") } },
-            dismissButton = { TextButton(onClick = { showDatePicker = false }) { Text("Cancel") } }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-
-    AppFormDialog(
-        title = "Create New Goal",
-        isSaveEnabled = title.isNotBlank() && amount.toDoubleOrNull() != null,
-        onDismiss = onDismiss,
-        onSave = {
-            val deadlineDate = datePickerState.selectedDateMillis?.let { millis ->
-                Instant.fromEpochMilliseconds(millis)
-                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
-            }
-            onSave(CreateGoalRequest(title, amount.toAmountMinorUnits(), selectedCurrency, deadlineDate))
-        }
-    ) {
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Goal Title") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = amount,
-            onValueChange = { amount = it },
-            label = { Text("Target Amount") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        AppDropdown(
-            label = "Currency",
-            options = availableCurrencies,
-            selectedOption = selectedCurrency,
-            onOptionSelected = { selectedCurrency = it }
-        )
-
-        OutlinedTextField(
-            value = selectedDateString,
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Deadline (Optional)") },
-            trailingIcon = {
-                IconButton(onClick = { showDatePicker = true }) {
-                    Icon(Icons.Default.DateRange, contentDescription = "Select Date")
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
         )
     }
 }

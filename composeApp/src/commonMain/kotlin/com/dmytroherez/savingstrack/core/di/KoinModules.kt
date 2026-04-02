@@ -22,6 +22,7 @@ import com.dmytroherez.savingstrack.domain.usecase.goals.GetGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
+import com.dmytroherez.savingstrack.presentation.home.addgoal.AddGoalViewModel
 import com.dmytroherez.savingstrack.presentation.savings.addtransaction.AddTransactionViewModel
 import com.dmytroherez.savingstrack.presentation.transactions.TransactionsViewModel
 import dev.gitlive.firebase.Firebase
@@ -101,9 +102,14 @@ val presentationModule = module {
 
     viewModel {
         HomeViewModel(
-            addGoalUC = get(),
             getGoalsUC = get(),
             completeGoalUC = get()
+        )
+    }
+
+    viewModel {
+        AddGoalViewModel(
+            addGoalUC = get()
         )
     }
 

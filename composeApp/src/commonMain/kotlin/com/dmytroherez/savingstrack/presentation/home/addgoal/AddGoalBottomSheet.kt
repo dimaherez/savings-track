@@ -1,20 +1,26 @@
-package com.dmytroherez.savingstrack.presentation.savings.addtransaction
+package com.dmytroherez.savingstrack.presentation.home.addgoal
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,35 +34,35 @@ import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.bottomSheet.LocalBottomSheetNavigator
 import com.dmytroherez.savingstrack.core.presentation.components.AppDropdown
-import com.dmytroherez.savingstrack.dto.transactions.SavingCategory
+import com.dmytroherez.savingstrack.presentation.savings.addtransaction.AddTransactionAction
 import multiplatform.network.cmptoast.showToast
 import org.koin.compose.viewmodel.koinViewModel
 
-object AddTransactionBottomSheet : Screen {
+object AddGoalBottomSheet : Screen {
     @Composable
     override fun Content() {
         val bottomSheetNavigator = LocalBottomSheetNavigator.current
 
         val lifecycleOwner = LocalLifecycleOwner.current
 
-        val viewModel = koinViewModel<AddTransactionViewModel>()
+        val viewModel = koinViewModel<AddGoalViewModel>()
         val state by viewModel.state.collectAsStateWithLifecycle()
 
         LaunchedEffect(lifecycleOwner.lifecycle) {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.event.collect { event ->
                     when (event) {
-                        is AddTransactionEvent.ShowToast -> {
+                        is AddGoalEvent.ShowToast -> {
                             showToast(event.message.asStringSuspend())
                         }
 
-                        AddTransactionEvent.CloseBottomSheet -> bottomSheetNavigator.hide()
+                        AddGoalEvent.Dismiss -> bottomSheetNavigator.hide()
                     }
                 }
             }
         }
 
-        AddTransactionBottomSheetContent(
+        AddGoalBottomSheetContent(
             state = state,
             onAction = viewModel::onAction
         )
@@ -64,10 +70,29 @@ object AddTransactionBottomSheet : Screen {
 }
 
 @Composable
-private fun AddTransactionBottomSheetContent(
-    state: AddTransactionState,
-    onAction: (AddTransactionAction) -> Unit
+private fun AddGoalBottomSheetContent(
+    state: AddGoalState,
+    onAction: (AddGoalAction) -> Unit
 ) {
+    val datePickerState = rememberDatePickerState()
+
+    if (state.showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { onAction(AddGoalAction.ToggleDatePicker) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onAction(AddGoalAction.OnDateChange(datePickerState.selectedDateMillis))
+                    }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = { TextButton(onClick = { onAction(AddGoalAction.ToggleDatePicker) }) { Text("Cancel") } }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     Column(
         modifier = Modifier
             .padding(24.dp)
@@ -76,63 +101,58 @@ private fun AddTransactionBottomSheetContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Add Transaction",
+            text = "Create New Goal",
             style = MaterialTheme.typography.headlineSmall
         )
 
-        AppDropdown(
-            label = "Goal",
-            options = state.availableGoals,
-            selectedOption = state.goal,
-            onOptionSelected = { onAction(AddTransactionAction.OnSetGoal(it)) },
-            displayText = { it?.title ?: "null" }
+        OutlinedTextField(
+            value = state.title,
+            onValueChange = { onAction(AddGoalAction.OnTitleChange(it)) },
+            label = { Text("Goal Title") },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
-        AppDropdown(
-            label = "Category",
-            options = SavingCategory.entries,
-            selectedOption = state.category,
-            onOptionSelected = { onAction(AddTransactionAction.OnCategoryChange(it)) },
-            displayText = { it.name }
+        OutlinedTextField(
+            value = state.amount,
+            onValueChange = { onAction(AddGoalAction.OnAmountChange(it)) },
+            label = { Text("Target Amount") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
         )
 
         AppDropdown(
             label = "Currency",
             options = state.availableCurrencies,
             selectedOption = state.currency,
-            onOptionSelected = { onAction(AddTransactionAction.OnCurrencyChange(it)) }
+            onOptionSelected = { onAction(AddGoalAction.OnCurrencyChange(it)) }
         )
 
         OutlinedTextField(
-            value = state.amount,
-            onValueChange = { onAction(AddTransactionAction.OnAmountChange(it)) },
-            label = { Text("Amount") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            singleLine = true,
+            value = state.selectedDate?.toString() ?: "",
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Deadline (Optional)") },
+            trailingIcon = {
+                IconButton(onClick = { onAction(AddGoalAction.ToggleDatePicker) }) {
+                    Icon(Icons.Default.DateRange, contentDescription = "Select Date")
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
-        OutlinedTextField(
-            value = state.description,
-            onValueChange = { onAction(AddTransactionAction.OnDescriptionChange(it)) },
-            label = { Text("Description (Optional)") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Standardized Action Buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            TextButton(onClick = { onAction(AddTransactionAction.OnCancelClick) }) {
+            TextButton(onClick = { onAction(AddGoalAction.Dismiss) }) {
                 Text("Cancel")
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(
                 enabled = state.isLoading.not(),
-                onClick = { onAction(AddTransactionAction.OnSaveClick) }
+                onClick = { onAction(AddGoalAction.AddGoal) }
             ) {
                 Text("Save")
             }

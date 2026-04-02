@@ -45,13 +45,14 @@ val LocalRootNavigator = staticCompositionLocalOf<Navigator?> { null }
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainApp() {
+
     MaterialTheme {
         BottomSheetNavigator(
             sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             sheetBackgroundColor = MaterialTheme.colorScheme.surface,
             sheetContentColor = MaterialTheme.colorScheme.onSurface
         ) {
-            Scaffold { innerPadding ->
+            Scaffold{ innerPadding ->
                 Surface(
                     modifier = Modifier.fillMaxSize().padding(innerPadding),
                     color = MaterialTheme.colorScheme.background

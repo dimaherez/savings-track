@@ -5,7 +5,5 @@ import com.dmytroherez.savingstrack.dto.goals.GoalItem
 
 data class HomeState(
     val goals: List<GoalItem> = emptyList(),
-    val goalsLoading: Boolean = false,
-    val showAddGoalDialog: Boolean = false,
-    val isGoalAddingLoading: Boolean = false
+    val goalsLoading: Boolean = false
 ) : BaseUiState
