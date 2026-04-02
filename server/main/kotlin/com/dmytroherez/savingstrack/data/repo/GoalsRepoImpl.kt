@@ -20,7 +20,6 @@ import org.jetbrains.exposed.v1.core.leftJoin
 import org.jetbrains.exposed.v1.core.sum
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
-import org.jetbrains.exposed.v1.jdbc.selectAll
 import org.jetbrains.exposed.v1.jdbc.update
 import kotlin.time.Clock
 
@@ -43,20 +42,18 @@ class GoalsRepoImpl : GoalsRepo {
             val currentAmountSum = TransactionsTable.amount.sum()
 
             val goals = GoalsTable.leftJoin(TransactionsTable, { id }, { TransactionsTable.goalId })
-                .select(
-                    GoalsTable.columns + currentAmountSum
-                )
+                .select(GoalsTable.columns + currentAmountSum)
                 .where { GoalsTable.firebaseUid eq userId }
-                .groupBy(
-                    *GoalsTable.columns.toTypedArray()
-                )
+                .groupBy(*GoalsTable.columns.toTypedArray())
                 .map { row ->
                     val targetAmount = row[targetAmount]
+                    val currentAmount = row[currentAmountSum] ?: 0L
 
-                    val currentAmount = row[currentAmountSum] ?: 0
-
-                    val progress =
-                        (currentAmount / targetAmount).toFloat().takeIf { targetAmount > 0 } ?: 0f
+                    val progress = if (targetAmount > 0L) {
+                        currentAmount.toFloat() / targetAmount.toFloat()
+                    } else {
+                        0f
+                    }
 
                     GoalItem(
                         id = row[id],
@@ -67,16 +64,18 @@ class GoalsRepoImpl : GoalsRepo {
                         progress = progress,
                         deadline = row[deadline],
                         createdAt = row[createdAt],
-                        completedAt = row[completedAt]
+                        completedAt = row[completedAt],
+                        recentTransactions = emptyList(), // init value, calculated by the code below
+                        hasMoreTransactions = false  // init value, calculated by the code below
                     )
                 }
 
             goals.map { goal ->
-                val lastTransactions = TransactionsTable
-                    .selectAll()
+                val latestTransactionsQuery = TransactionsTable
+                    .select(TransactionsTable.columns)
                     .where { TransactionsTable.goalId eq goal.id }
                     .orderBy(TransactionsTable.createdAt to SortOrder.DESC)
-                    .limit(3)
+                    .limit(4)
                     .map { row ->
                         TransactionItem(
                             id = row[TransactionsTable.id],
@@ -89,11 +88,16 @@ class GoalsRepoImpl : GoalsRepo {
                         )
                     }
 
-                goal.copy(recentTransactions = lastTransactions)
+                val hasMore = latestTransactionsQuery.size > 3
+                val displayTransactions = latestTransactionsQuery.take(3)
+
+                goal.copy(
+                    recentTransactions = displayTransactions,
+                    hasMoreTransactions = hasMore
+                )
             }
         }
     }
-
     override suspend fun setAsCompleted(goalId: Int) {
         dbQuery {
             GoalsTable.update(where = { id eq goalId }) {

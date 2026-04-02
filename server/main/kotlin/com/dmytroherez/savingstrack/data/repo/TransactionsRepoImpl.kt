@@ -45,11 +45,12 @@ class TransactionsRepoImpl : TransactionsRepo {
         return dbQuery {
             val transactionsRaw = TransactionsTable
                 .selectAll()
-                .where { (TransactionsTable.firebaseUid eq userId) and (TransactionsTable.currency eq currency)}
+                .where { (TransactionsTable.firebaseUid eq userId) and (TransactionsTable.currency eq currency) }
                 .orderBy(createdAt, SortOrder.DESC)
 
-            TransactionsByCurrencyResponse (
-                totalAmount = transactionsRaw.map { it[amount] }.reduce { amount1, amount2 -> amount1 + amount2},
+            TransactionsByCurrencyResponse(
+                totalAmount = transactionsRaw.map { it[amount] }
+                    .reduce { amount1, amount2 -> amount1 + amount2 },
                 transactions = transactionsRaw.map {
                     TransactionItem(
                         id = it[TransactionsTable.id],
@@ -67,63 +68,64 @@ class TransactionsRepoImpl : TransactionsRepo {
 
     override suspend fun getTransactionsDashboard(userId: String): DashboardResponse {
         return dbQuery {
-            val totalAmount = amount.sum()
+            val totalAmountSum = amount.sum()
 
             val aggregatedTotals = TransactionsTable
-                .select(category, currency, totalAmount)
+                .select(category, currency, totalAmountSum)
                 .where { TransactionsTable.firebaseUid eq userId }
                 .groupBy(category, currency)
                 .map { row ->
-                    val category = row[category]
-                    val currency = row[currency]
-                    val sum = row[totalAmount] ?: 0L
-                    TransactionsAggregatedTotal(category, currency, sum)
-                }
-
-            val transactions = TransactionsTable
-                .selectAll()
-                .where {TransactionsTable.firebaseUid eq userId}
-                .orderBy(createdAt to SortOrder.DESC)
-                .map { row ->
-                    TransactionItem(
-                        id = row[TransactionsTable.id],
-                        userId = row[TransactionsTable.firebaseUid],
+                    TransactionsAggregatedTotal(
                         category = row[category],
                         currency = row[currency],
-                        amount = row[amount],
-                        description = row[description],
-                        createdAt = row[createdAt]
+                        sum = row[totalAmountSum] ?: 0L
                     )
                 }
 
             val goals = GoalsTable
-                .select(
-                    GoalsTable.id,
-                    GoalsTable.title
-                )
+                .select(GoalsTable.id, GoalsTable.title)
                 .where { (GoalsTable.firebaseUid eq userId) and (GoalsTable.completedAt eq null) }
                 .orderBy(GoalsTable.createdAt to SortOrder.DESC)
-                .map {
+                .map { row ->
                     GoalForTransactionItem(
-                        id = it[GoalsTable.id],
-                        title = it[GoalsTable.title]
+                        id = row[GoalsTable.id],
+                        title = row[GoalsTable.title]
                     )
                 }
 
-            val categoriesMap =
-                aggregatedTotals.map { it.category }.associateWith { category ->
-                    aggregatedTotals
-                        .filter { it.category == category }
-                        .map {
-                            val recentTransactions =
-                                transactions.filter { item -> item.currency == it.currency }
-                            CurrencyTotal(
-                                currency = it.currency,
-                                totalAmount = it.sum,
-                                recentTransactions = recentTransactions.take(3),
-                                hasMoreTransactions = recentTransactions.size > 3
-                            )
-                        }
+            val categoriesMap = aggregatedTotals
+                .groupBy { it.category }
+                .mapValues { (currentCategory, categoryBuckets) ->
+
+                    categoryBuckets.map { bucket ->
+                        val recentQuery = TransactionsTable
+                            .selectAll()
+                            .where {
+                                (TransactionsTable.firebaseUid eq userId) and
+                                        (category eq currentCategory) and
+                                        (currency eq bucket.currency)
+                            }
+                            .orderBy(createdAt to SortOrder.DESC)
+                            .limit(4)
+                            .map { row ->
+                                TransactionItem(
+                                    id = row[TransactionsTable.id],
+                                    userId = row[TransactionsTable.firebaseUid],
+                                    category = row[category],
+                                    currency = row[currency],
+                                    amount = row[amount],
+                                    description = row[description],
+                                    createdAt = row[createdAt]
+                                )
+                            }
+
+                        CurrencyTotal(
+                            currency = bucket.currency,
+                            totalAmount = bucket.sum,
+                            recentTransactions = recentQuery.take(3),
+                            hasMoreTransactions = recentQuery.size > 3
+                        )
+                    }
                 }
 
             DashboardResponse(

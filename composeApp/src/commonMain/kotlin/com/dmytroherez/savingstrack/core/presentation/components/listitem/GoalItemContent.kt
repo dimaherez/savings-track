@@ -82,7 +82,7 @@ fun GoalItemContent(
         TransactionsDropdownMenu(
             expanded = dropdownExpanded,
             transactions = goalItem.recentTransactions,
-            hasMoreTransactions = false, // goalItem.hasMoreTransactions
+            hasMoreTransactions = goalItem.hasMoreTransactions,
             onDismissRequest = { dropdownExpanded = false },
             onViewAllClick = { onViewAllClick(goalItem.id) },
         )

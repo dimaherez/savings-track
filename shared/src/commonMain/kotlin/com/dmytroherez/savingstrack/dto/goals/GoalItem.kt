@@ -15,6 +15,7 @@ data class GoalItem(
     val progress: Float,
     val createdAt: Instant,
     val completedAt: Instant?,
-    val deadline: LocalDate? = null,
-    val recentTransactions: List<TransactionItem> = emptyList()
+    val deadline: LocalDate?,
+    val recentTransactions: List<TransactionItem>,
+    val hasMoreTransactions: Boolean
 )
