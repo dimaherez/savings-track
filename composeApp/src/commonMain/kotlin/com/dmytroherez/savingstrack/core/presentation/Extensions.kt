@@ -38,4 +38,6 @@ object Extensions {
             }
         )
     }
+
+    fun Float.toDisplayPercentageString() = "${(this * 1000).toInt() / 10f}%"
 }

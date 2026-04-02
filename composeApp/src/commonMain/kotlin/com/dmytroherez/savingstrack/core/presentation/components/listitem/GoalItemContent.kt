@@ -1,5 +1,6 @@
 package com.dmytroherez.savingstrack.core.presentation.components.listitem
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,9 +13,12 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,6 +29,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import com.dmytroherez.savingstrack.core.presentation.Constants.ROUNDED_SHAPE_DEFAULT
 import com.dmytroherez.savingstrack.core.presentation.Extensions.toDisplayDateString
+import com.dmytroherez.savingstrack.core.presentation.Extensions.toDisplayPercentageString
 import com.dmytroherez.savingstrack.core.presentation.components.dropdown.TransactionsDropdownMenu
 import com.dmytroherez.savingstrack.core.utils.formatAsFiat
 import com.dmytroherez.savingstrack.dto.goals.GoalItem
@@ -36,6 +41,17 @@ fun GoalItemContent(
     onViewAllClick: (Int) -> Unit
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
+
+    var targetProgress by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(goalItem.progress) {
+        targetProgress = goalItem.progress
+
+    }
+    val animatedProgress by animateFloatAsState(
+        targetValue = targetProgress,
+        animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec
+    )
+
     ExposedDropdownMenuBox(
         modifier = Modifier
             .fillMaxWidth()
@@ -47,12 +63,11 @@ fun GoalItemContent(
         Box {
             LinearProgressIndicator(
                 modifier = Modifier.matchParentSize(),
-                strokeCap = StrokeCap.Square,
+                strokeCap = StrokeCap.Butt,
                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                 trackColor = Color.Transparent,
-                progress = {
-                    goalItem.progress
-                }
+                progress = { animatedProgress },
+                drawStopIndicator = {}
             )
 
             Column(
@@ -73,7 +88,7 @@ fun GoalItemContent(
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(
-                        text = "${goalItem.progress * 100}%",
+                        text = goalItem.progress.toDisplayPercentageString(),
                     )
                 }
             }
