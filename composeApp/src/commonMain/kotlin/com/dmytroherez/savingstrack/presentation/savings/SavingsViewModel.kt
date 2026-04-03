@@ -4,17 +4,25 @@ import androidx.lifecycle.viewModelScope
 import com.dmytroherez.savingstrack.core.presentation.BaseViewModel
 import com.dmytroherez.savingstrack.core.presentation.UiText
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
+import com.dmytroherez.savingstrack.domain.usecase.savings.TransactionsRefreshTriggerUC
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 
 class SavingsViewModel(
-    private val getSavingsDashboardUC: GetSavingsDashboardUC
+    private val getSavingsDashboardUC: GetSavingsDashboardUC,
+    private val transactionsRefreshTriggerUC: TransactionsRefreshTriggerUC
 ) : BaseViewModel<SavingsState, SavingsEvent, SavingsAction>(
     SavingsState()
 ) {
     init {
         getSavingsDashboard()
+
+        viewModelScope.launch {
+            transactionsRefreshTriggerUC().collect {
+                getSavingsDashboard()
+            }
+        }
     }
 
     override fun onAction(action: SavingsAction) {

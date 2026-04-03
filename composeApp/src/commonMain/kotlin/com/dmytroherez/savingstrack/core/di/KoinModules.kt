@@ -16,9 +16,11 @@ import com.dmytroherez.savingstrack.domain.usecase.goals.AddGoalUC
 import com.dmytroherez.savingstrack.domain.usecase.goals.CompleteGoalUC
 import com.dmytroherez.savingstrack.domain.usecase.goals.GetAvailableGoalsUC
 import com.dmytroherez.savingstrack.domain.usecase.goals.GetGoalsUC
+import com.dmytroherez.savingstrack.domain.usecase.goals.GoalsRefreshTriggerUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetSavingsDashboardUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.GetTransactionsByCurrencyUC
 import com.dmytroherez.savingstrack.domain.usecase.savings.PostSavingUC
+import com.dmytroherez.savingstrack.domain.usecase.savings.TransactionsRefreshTriggerUC
 import com.dmytroherez.savingstrack.presentation.auth.AuthViewModel
 import com.dmytroherez.savingstrack.presentation.home.HomeViewModel
 import com.dmytroherez.savingstrack.presentation.home.addgoal.AddGoalViewModel
@@ -64,12 +66,14 @@ val domainModule = module {
     singleOf(::GetTransactionsByCurrencyUC)
     singleOf(::PostSavingUC)
     singleOf(::GetSavingsDashboardUC)
+    singleOf(::TransactionsRefreshTriggerUC)
 
     // Goals
     singleOf(::AddGoalUC)
     singleOf(::GetGoalsUC)
     singleOf(::GetAvailableGoalsUC)
     singleOf(::CompleteGoalUC)
+    singleOf(::GoalsRefreshTriggerUC)
 }
 
 val presentationModule = module {

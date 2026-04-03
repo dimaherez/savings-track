@@ -11,14 +11,6 @@ object GoalsRoute {
     class Available(val parent: GoalsRoute = GoalsRoute)
 
     @Serializable
-    @Resource("/list")
-    class ListAll(val parent: GoalsRoute = GoalsRoute)
-
-    @Serializable
-    @Resource("/add")
-    class Add(val parent: GoalsRoute = GoalsRoute)
-
-    @Serializable
     @Resource("/{goalId}/complete")
     class Complete(
         val parent: GoalsRoute = GoalsRoute,

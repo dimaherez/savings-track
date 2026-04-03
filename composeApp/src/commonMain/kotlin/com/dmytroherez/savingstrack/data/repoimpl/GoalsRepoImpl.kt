@@ -12,17 +12,24 @@ import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.patch
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.setBody
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class GoalsRepoImpl(
     private val httpClient: HttpClient
 ) : GoalsRepo {
+
+    private val _refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val refreshTrigger = _refreshTrigger.asSharedFlow()
+
     override suspend fun addGoal(
         request: CreateGoalRequest
     ): Result<Unit> {
         return try {
-            httpClient.post(GoalsRoute.Add()) {
+            httpClient.post(GoalsRoute) {
                 setBody(request)
             }
+            _refreshTrigger.tryEmit(Unit)
             Result.success(Unit)
         } catch (e: Exception) {
             Logger.e(e) { "GoalsRepoImpl.addGoal()" }
@@ -32,7 +39,7 @@ class GoalsRepoImpl(
 
     override suspend fun getGoals(): Result<List<GoalItem>> {
         return try {
-            val response = httpClient.get(GoalsRoute.ListAll())
+            val response = httpClient.get(GoalsRoute)
             Result.success(response.body())
         } catch (e: Exception) {
             Logger.e(e) { "GoalsRepoImpl.getGoals()" }

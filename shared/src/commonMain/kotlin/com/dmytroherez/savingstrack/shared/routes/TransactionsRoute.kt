@@ -7,10 +7,6 @@ import kotlinx.serialization.Serializable
 @Resource("/transactions")
 object TransactionsRoute {
     @Serializable
-    @Resource("/add")
-    class Add(val parent: TransactionsRoute = TransactionsRoute)
-
-    @Serializable
     @Resource("/list/{currency}")
     class GetByCurrency(
         val parent: TransactionsRoute = TransactionsRoute,

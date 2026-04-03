@@ -11,17 +11,24 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.setBody
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class SavingsRepoImpl(
     private val httpClient: HttpClient
 ) : SavingsRepo {
+
+    private val _refreshTrigger = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    override val refreshTrigger = _refreshTrigger.asSharedFlow()
+
     override suspend fun postSaving(
         request: PostTransactionRequest
     ): Result<Unit> {
         return try {
-            httpClient.post(TransactionsRoute.Add()) {
+            httpClient.post(TransactionsRoute) {
                 setBody(request)
             }
+            _refreshTrigger.tryEmit(Unit)
             Result.success(Unit)
         } catch (e: Exception) {
             Logger.e(e) { "SavingsRepoImpl.postSaving()" }

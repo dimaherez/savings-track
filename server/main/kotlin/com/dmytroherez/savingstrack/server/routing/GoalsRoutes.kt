@@ -9,22 +9,32 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.resources.get
+import io.ktor.server.resources.post
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.patch
-import io.ktor.server.routing.post
 import org.koin.ktor.ext.inject
 
 fun Routing.goalsRoutes() {
     val repository by inject<GoalsRepo>()
 
     authenticate(JWT_NAME) {
-        get<GoalsRoute.ListAll> {
+        get<GoalsRoute> {
             withSecureUid { uid ->
                 call.respond(
                     status = HttpStatusCode.OK,
                     message = repository.getGoals(uid)
                 )
+            }
+        }
+
+        post<GoalsRoute> {
+            withSecureUid { uid ->
+                repository.addGoal(
+                    userId = uid,
+                    request = call.receive<CreateGoalRequest>()
+                )
+                call.respond(HttpStatusCode.Created)
             }
         }
 
@@ -34,16 +44,6 @@ fun Routing.goalsRoutes() {
                     status = HttpStatusCode.OK,
                     message = repository.getGoalsForTransaction(uid)
                 )
-            }
-        }
-
-        post<GoalsRoute.Add> {
-            withSecureUid { uid ->
-                repository.addGoal(
-                    userId = uid,
-                    request = call.receive<CreateGoalRequest>()
-                )
-                call.respond(HttpStatusCode.Created)
             }
         }
 

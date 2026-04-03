@@ -11,14 +11,14 @@ import io.ktor.server.request.receive
 import io.ktor.server.resources.get
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Routing
-import io.ktor.server.routing.post
+import io.ktor.server.resources.post
 import org.koin.ktor.ext.inject
 
 fun Routing.transactionsRoutes() {
     val repository by inject<TransactionsRepo>()
 
     authenticate(JWT_NAME) {
-        post<TransactionsRoute.Add> {
+        post<TransactionsRoute> {
             withSecureUid { uid ->
                 repository.addTransaction(uid, call.receive<PostTransactionRequest>())
                 call.respond(HttpStatusCode.Created)
